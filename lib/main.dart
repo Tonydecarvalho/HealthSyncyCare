@@ -25,6 +25,7 @@ class MyApp extends StatelessWidget {
           '/home': (context) => MyHomePage(),
           '/appointment': (context) => AppointmentPage(),
         },
+        debugShowCheckedModeBanner: false,
       ),
     );
   }
