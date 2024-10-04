@@ -119,7 +119,9 @@ class _AppointmentPageState extends State<AppointmentPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () {}, // Add navigation logic if needed
+          onPressed: () {
+            Navigator.of(context).pop();
+          }, 
         ),
         title: const Text('Appointment'),
       ),

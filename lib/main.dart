@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthsyncycare/screens/home_screen.dart';
+import 'package:healthsyncycare/screens/appointment.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -20,6 +21,10 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
         home: MyHomePage(),
+        routes: {
+          '/home': (context) => MyHomePage(),
+          '/appointment': (context) => AppointmentPage(),
+        },
       ),
     );
   }
