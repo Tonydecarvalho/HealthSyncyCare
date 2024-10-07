@@ -108,6 +108,7 @@ class MyHomePage extends StatelessWidget {
                           onTap: () {
                             switch (index) {
                               case 0:
+                                Navigator.pushNamed(context, '/sharedCondition');
                                 print("Open Share page");
                                 break;
                               case 1:

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "679874674301",
+    "project_id": "healthsyncycare",
+    "storage_bucket": "healthsyncycare.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679874674301:android:dd3806997bcaee8c697b14",
+        "android_client_info": {
+          "package_name": "com.example.healthsyncycare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6l44aSSzRICm9K7Ayt2CCfTXayXgtIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
