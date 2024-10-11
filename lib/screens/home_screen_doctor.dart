@@ -102,6 +102,7 @@ class MyHomePageDoctor extends StatelessWidget {
                           onTap: () {
                             switch (index) {
                               case 0:
+                                Navigator.pushNamed(context, '/patients conditions');
                                 print("Open Patient page");
                                 break;
                               case 1:

@@ -72,7 +72,7 @@ class MyHomePage extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1,
                           wordSpacing: 2,
-                          color: const Color(0xFFFFFFFF))),
+                          color: Color(0xFFFFFFFF))),
                 ),
               ],
             ),
