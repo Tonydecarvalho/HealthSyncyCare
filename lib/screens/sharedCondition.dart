@@ -16,17 +16,22 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
   final List<int> _days = List.generate(30, (index) => index + 1); // Range of 1 to 30 days
 
   void _addSymptom() {
-    final description = _descriptionController.text;
-    final duration = _selectedDuration;
+  final description = _descriptionController.text;
+  final duration = _selectedDuration;
+  final timestamp = Timestamp.fromDate(DateTime.now()); // Capture the current date and time
 
-    if (description.isNotEmpty && duration != null) {
-      setState(() {
-        _symptoms.add({'description': description, 'duration': duration});
-        _descriptionController.clear();
-        _selectedDuration = null;
+  if (description.isNotEmpty && duration != null) {
+    setState(() {
+      _symptoms.add({
+        'description': description,
+        'duration': duration,
+        'timestamp': timestamp, // Add timestamp field
       });
-    }
+      _descriptionController.clear();
+      _selectedDuration = null;
+    });
   }
+}
 
 void _saveConditions() async {
   if (_symptoms.isNotEmpty) {
