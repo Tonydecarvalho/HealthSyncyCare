@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
-        home: MyHomePageDoctor(),
+        home: MyHomePage(),
         routes: {
           '/home': (context) => MyHomePage(),
           '/appointment': (context) => AppointmentPage(userId: 'user1',),
