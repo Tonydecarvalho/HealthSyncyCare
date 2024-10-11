@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:healthsyncycare/screens/home_screen.dart';
 import 'package:healthsyncycare/screens/appointment.dart';
+import 'package:healthsyncycare/screens/sharedCondition.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 
-
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -29,6 +32,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/home': (context) => MyHomePage(),
           '/appointment': (context) => AppointmentPage(userId: 'user1',),
+          '/sharedCondition': (context) => SharedConditionPage(),
         },
         debugShowCheckedModeBanner: false,
       ),
