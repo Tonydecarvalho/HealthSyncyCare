@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -28,7 +29,7 @@ class MyApp extends StatelessWidget {
         home: MyHomePage(),
         routes: {
           '/home': (context) => MyHomePage(),
-          '/appointment': (context) => AppointmentPage(),
+          '/appointment': (context) => AppointmentPage(userId: 'user1',),
           '/sharedCondition': (context) => SharedConditionPage(),
         },
         debugShowCheckedModeBanner: false,
