@@ -50,7 +50,9 @@ class MyApp extends StatelessWidget {
               ),
           '/sharedCondition': (context) => SharedConditionPage(),
           '/patients conditions': (context) => PatientsConditions(),
-          '/patient condition details': (context) => PatientConditionDetails()
+          '/patient condition details': (context) => PatientConditionDetails(),
+          '/doctor': (context) => MyHomePageDoctor(),
+          '/login': (context) => LoginPage()
         },
         debugShowCheckedModeBanner: false,
       ),

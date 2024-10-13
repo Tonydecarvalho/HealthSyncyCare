@@ -16,12 +16,12 @@ class MyHomePageDoctor extends StatelessWidget {
     ),
     const Icon(
       Icons.calendar_month_sharp,
-      color: Color(0xFF008000),
+      color: Color(0xFFA9A9A9), // Couleur grisée pour l'icône d'Appointment
       size: 80
     ),
     const Icon(
       Icons.history,
-      color: Color(0xFF008000),
+      color: Color(0xFFA9A9A9), // Couleur grisée pour l'icône d'Appointment
       size: 80
     )
   ];
@@ -98,6 +98,8 @@ class MyHomePageDoctor extends StatelessWidget {
                         mainAxisSpacing: 20,
                         crossAxisSpacing: 20),
                     itemBuilder: (context, index) {
+                    // Vérifiez si l'index correspond à une fonctionnalité désactivée
+                    bool isDisabled = index == 1 || index == 2;
                       return InkWell(
                           onTap: () {
                             switch (index) {
@@ -120,7 +122,7 @@ class MyHomePageDoctor extends StatelessWidget {
                                 vertical: 20, horizontal: 10),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                color: const Color(0xFFFFFFFF),
+                                color: isDisabled ? Color(0xFFD3D3D3) : Color(0xFFFFFFFF), // Couleur de fond grisée
                                 boxShadow: [
                                   BoxShadow(
                                       color: const Color(0x339E9E9E),
