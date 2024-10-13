@@ -7,11 +7,22 @@ import 'package:firebase_core/firebase_core.dart';
 
 
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: FirebaseOptions(
+      apiKey: "AIzaSyAkgqV7qTBF-Fh7ZgT2Sponbbs2yJ-OvdI",
+      authDomain: "healthsyncycare.firebaseapp.com",
+      projectId: "healthsyncycare",
+      storageBucket: "healthsyncycare.appspot.com",
+      messagingSenderId: "679874674301",
+      appId: "1:679874674301:web:bf07bbfce91a715c697b14",
+      measurementId: "G-7LEGTKC5N0",
+    ),
+  );
   runApp(MyApp());
 }
+
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});

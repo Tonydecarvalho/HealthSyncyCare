@@ -7,6 +7,44 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:679874674301:android:9c157be43474e978697b14",
+        "android_client_info": {
+          "package_name": "ch.hevs.healthsyncare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6l44aSSzRICm9K7Ayt2CCfTXayXgtIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:679874674301:android:ee7119f8ae655b99697b14",
+        "android_client_info": {
+          "package_name": "ch.hevs.healthsyncycare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-6l44aSSzRICm9K7Ayt2CCfTXayXgtIY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:679874674301:android:dd3806997bcaee8c697b14",
         "android_client_info": {
           "package_name": "com.example.healthsyncycare"

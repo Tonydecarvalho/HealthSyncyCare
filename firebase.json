@@ -1,15 +1,39 @@
 {
-  "functions": [
-    {
-      "source": "functions",
-      "codebase": "default",
-      "ignore": [
-        "node_modules",
-        ".git",
-        "firebase-debug.log",
-        "firebase-debug.*.log",
-        "*.local"
-      ]
+    "flutter": {
+        "platforms": {
+            "android": {
+                "default": {
+                    "projectId": "healthsyncycare",
+                    "appId": "1:679874674301:android:9c157be43474e978697b14",
+                    "fileOutput": "android/app/google-services.json"
+                }
+            },
+            "dart": {
+                "lib/firebase_options.dart": {
+                    "projectId": "healthsyncycare",
+                    "configurations": {
+                        "android": "1:679874674301:android:9c157be43474e978697b14",
+                        "ios": "1:679874674301:ios:906bd93a763147c9697b14",
+                        "macos": "1:679874674301:ios:906bd93a763147c9697b14",
+                        "web": "1:679874674301:web:300ddaf8dd57d6db697b14",
+                        "windows": "1:679874674301:web:300ddaf8dd57d6db697b14"
+                    }
+                }
+            }
+        }
+    },
+    "hosting": {
+        "public": "build/web",
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            "**/node_modules/**"
+        ],
+        "rewrites": [
+            {
+                "source": "**",
+                "destination": "/index.html"
+            }
+        ]
     }
-  ]
 }
