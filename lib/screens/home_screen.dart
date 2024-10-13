@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatelessWidget {
-  
   final List categoriesNames = [
     "Shared",
     "Appointments",
@@ -10,26 +9,11 @@ class MyHomePage extends StatelessWidget {
   ];
 
   final List<Icon> categoriesIcons = [
-    const Icon(
-      Icons.medical_services_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.calendar_month_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.history,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.description_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
+    const Icon(Icons.medical_services_sharp,
+        color: Color(0xFF008000), size: 80),
+    const Icon(Icons.calendar_month_sharp, color: Color(0xFF008000), size: 80),
+    const Icon(Icons.history, color: Color(0xFF008000), size: 80),
+    const Icon(Icons.description_sharp, color: Color(0xFF008000), size: 80),
   ];
 
   @override
@@ -77,7 +61,6 @@ class MyHomePage extends StatelessWidget {
               ],
             ),
           ),
-
           Padding(
             padding: EdgeInsets.only(top: 20, left: 15, right: 15),
             child: Column(
@@ -108,7 +91,8 @@ class MyHomePage extends StatelessWidget {
                           onTap: () {
                             switch (index) {
                               case 0:
-                                Navigator.pushNamed(context, '/sharedCondition');
+                                Navigator.pushNamed(
+                                    context, '/sharedCondition');
                                 print("Open Share page");
                                 break;
                               case 1:
@@ -116,6 +100,8 @@ class MyHomePage extends StatelessWidget {
                                 print("Open Appointments page");
                                 break;
                               case 2:
+                                Navigator.pushNamed(
+                                    context, '/patients conditions');
                                 print("Open History page");
                                 break;
                               case 3:
@@ -149,8 +135,7 @@ class MyHomePage extends StatelessWidget {
                                   style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF000000)
-                                  ),
+                                      color: Color(0xFF000000)),
                                 ),
                               ],
                             ),
