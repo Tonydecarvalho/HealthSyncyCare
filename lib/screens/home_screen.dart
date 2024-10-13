@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class MyHomePage extends StatelessWidget {
-  
   final List categoriesNames = [
     "Shared",
     "Appointments",
@@ -72,12 +71,11 @@ class MyHomePage extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           letterSpacing: 1,
                           wordSpacing: 2,
-                          color: const Color(0xFFFFFFFF))),
+                          color: Color(0xFFFFFFFF))),
                 ),
               ],
             ),
           ),
-
           Padding(
             padding: EdgeInsets.only(top: 20, left: 15, right: 15),
             child: Column(
@@ -110,7 +108,8 @@ class MyHomePage extends StatelessWidget {
                           onTap: () {
                             switch (index) {
                               case 0:
-                                Navigator.pushNamed(context, '/sharedCondition');
+                                Navigator.pushNamed(
+                                    context, '/sharedCondition');
                                 print("Open Share page");
                                 break;
                               case 1:
@@ -118,6 +117,8 @@ class MyHomePage extends StatelessWidget {
                                 print("Open Appointments page");
                                 break;
                               case 2:
+                                Navigator.pushNamed(
+                                    context, '/patients conditions');
                                 print("Open History page");
                                 break;
                               case 3:
