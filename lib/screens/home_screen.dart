@@ -22,12 +22,12 @@ class MyHomePage extends StatelessWidget {
     ),
     const Icon(
       Icons.history,
-      color: Color(0xFF008000),
+      color: Color(0xFFA9A9A9),
       size: 80
     ),
     const Icon(
       Icons.description_sharp,
-      color: Color(0xFF008000),
+      color: Color(0xFFA9A9A9),
       size: 80
     ),
   ];
@@ -104,6 +104,8 @@ class MyHomePage extends StatelessWidget {
                         mainAxisSpacing: 20,
                         crossAxisSpacing: 20),
                     itemBuilder: (context, index) {
+                      // Vérifiez si l'index est pour "History" ou "Prescription" pour les désactiver
+                    bool isDisabled = index == 2 || index == 3;
                       return InkWell(
                           onTap: () {
                             switch (index) {
@@ -130,7 +132,7 @@ class MyHomePage extends StatelessWidget {
                                 vertical: 20, horizontal: 10),
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                color: const Color(0xFFFFFFFF),
+                                color: isDisabled ? Color(0xFFD3D3D3) : Color(0xFFFFFFFF),
                                 boxShadow: [
                                   BoxShadow(
                                       color: const Color(0x339E9E9E),
@@ -146,10 +148,10 @@ class MyHomePage extends StatelessWidget {
                                 const SizedBox(height: 10),
                                 Text(
                                   categoriesNames[index],
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF000000)
+                                      color: isDisabled ? Color(0xFFB0B0B0) : Color(0xFF000000), // Texte grisé
                                   ),
                                 ),
                               ],
