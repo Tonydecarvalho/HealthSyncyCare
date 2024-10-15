@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
+import 'package:healthsyncycare/screens/register_screen.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -59,6 +60,11 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  void _navigateToRegister() {
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => RegisterPage()));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,6 +76,19 @@ class _LoginPageState extends State<LoginPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("No yet registered?"),
+                TextButton(
+                  onPressed: _navigateToRegister,
+                  child: Text(
+                    "Register",
+                    style: TextStyle(color: Theme.of(context).primaryColor),
+                  ),
+                ),
+              ],
+            ),
             TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: 'Email'),
