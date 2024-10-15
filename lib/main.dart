@@ -14,8 +14,7 @@ import 'package:healthsyncycare/screens/register_screen.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
-
-
+import 'package:healthsyncycare/screens/profile.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -37,8 +36,9 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
-        home: RegisterPage(),
+        initialRoute: '/login', // Initial route set to login page
         routes: {
+          '/login': (context) => LoginPage(), // Add the login page route here
           '/home': (context) => MyHomePage(),
           '/appointment': (context) => AppointmentPage(userId: 'user1'),
           '/sharedCondition': (context) => SharedConditionPage(),
@@ -50,6 +50,7 @@ class MyApp extends StatelessWidget {
           '/prescriptions list': (context) => PatientPrescriptionsPage(),
           '/prescriptions details': (context) => PrescriptionDetailsPage(),
           '/doctor prescriptions list': (context) => DoctorPrescriptionsHistoryPage(),
+          '/profile': (context) => ProfilePage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == '/create prescription') {

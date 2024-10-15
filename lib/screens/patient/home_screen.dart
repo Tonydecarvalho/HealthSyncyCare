@@ -29,21 +29,19 @@ class MyHomePage extends StatelessWidget {
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
                 )),
-            child: Column(
+           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(
-                      Icons.dashboard,
-                      size: 30,
-                      color: Color(0xFFFFFFFF),
-                    ),
-                    const Icon(
-                      Icons.account_circle_sharp,
-                      size: 30,
-                      color: Color(0xFFFFFFFF),
+                    const Icon(Icons.dashboard, size: 30, color: Color(0xFFFFFFFF)),
+                    InkWell(
+                      onTap: () {
+                         Navigator.pushNamed(
+                                    context, '/profile');
+                      },
+                      child: const Icon(Icons.account_circle_sharp, size: 30, color: Color(0xFFFFFFFF)),
                     ),
                   ],
                 ),
