@@ -45,15 +45,13 @@ class MyHomePageDoctor extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(
-                      Icons.dashboard,
-                      size: 30,
-                      color: Color(0xFFFFFFFF),
-                    ),
-                    const Icon(
-                      Icons.account_circle_sharp,
-                      size: 30,
-                      color: Color(0xFFFFFFFF),
+                    const Icon(Icons.dashboard, size: 30, color: Color(0xFFFFFFFF)),
+                    InkWell(
+                      onTap: () {
+                         Navigator.pushNamed(
+                                    context, '/profile');
+                      },
+                      child: const Icon(Icons.account_circle_sharp, size: 30, color: Color(0xFFFFFFFF)),
                     ),
                   ],
                 ),
