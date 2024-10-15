@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:healthsyncycare/screens/home_screen.dart';
-import 'package:healthsyncycare/screens/home_screen_doctor.dart';
+import 'package:healthsyncycare/screens/patient/home_screen.dart';
+import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 
 class LoginPage extends StatefulWidget {
   @override

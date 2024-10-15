@@ -1,29 +1,19 @@
 import 'package:flutter/material.dart';
 
-class MyHomePageDoctor extends StatelessWidget {
-  
+class MyHomePage extends StatelessWidget {
   final List categoriesNames = [
-    "Patient",
+    "Shared",
     "Appointments",
-    "History prescription"
+    "History",
+    "Prescription"
   ];
 
   final List<Icon> categoriesIcons = [
-    const Icon(
-      Icons.medical_services_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.calendar_month_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.history,
-      color: Color(0xFF008000),
-      size: 80
-    )
+    const Icon(Icons.medical_services_sharp,
+        color: Color(0xFF008000), size: 80),
+    const Icon(Icons.calendar_month_sharp, color: Color(0xFF008000), size: 80),
+    const Icon(Icons.history, color: Color(0xFF008000), size: 80),
+    const Icon(Icons.description_sharp, color: Color(0xFF008000), size: 80),
   ];
 
   @override
@@ -60,7 +50,7 @@ class MyHomePageDoctor extends StatelessWidget {
                 const SizedBox(height: 20),
                 Padding(
                   padding: EdgeInsets.only(left: 3, bottom: 15),
-                  child: Text("Dr Jane,",
+                  child: Text("Hello, John",
                       style: const TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w600,
@@ -71,7 +61,6 @@ class MyHomePageDoctor extends StatelessWidget {
               ],
             ),
           ),
-
           Padding(
             padding: EdgeInsets.only(top: 20, left: 15, right: 15),
             child: Column(
@@ -102,14 +91,23 @@ class MyHomePageDoctor extends StatelessWidget {
                           onTap: () {
                             switch (index) {
                               case 0:
-                                Navigator.pushNamed(context, '/patients conditions');
-                                print("Open Patient page");
+                                Navigator.pushNamed(
+                                    context, '/sharedCondition');
+                                print("Open Share page");
                                 break;
                               case 1:
+                                Navigator.pushNamed(context, '/appointment');
                                 print("Open Appointments page");
                                 break;
                               case 2:
-                                print("Open History prescription page");
+                                Navigator.pushNamed(
+                                    context, '/patients conditions patient');
+                                print("Open History page");
+                                break;
+                              case 3:
+                                Navigator.pushNamed(
+                                    context, '/prescriptions list');
+                                print("Open Prescription page");
                                 break;
                               default:
                                 print("default");
@@ -134,21 +132,37 @@ class MyHomePageDoctor extends StatelessWidget {
                                     padding: EdgeInsets.all(10),
                                     child: categoriesIcons[index]),
                                 const SizedBox(height: 10),
-                                FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    categoriesNames[index],
-                                    style: const TextStyle(
+                                Text(
+                                  categoriesNames[index],
+                                  style: const TextStyle(
                                       fontSize: 22,
                                       fontWeight: FontWeight.w600,
-                                      color: Color(0xFF000000)
-                                    ),
-                                  )
+                                      color: Color(0xFF000000)),
                                 ),
                               ],
                             ),
                           ));
                     }),
+                const SizedBox(height: 30),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Divider(),
+                    ),
+                    const Text("Reminder"),
+                    Expanded(
+                      child: Divider(),
+                    )
+                  ],
+                ),
+                const SizedBox(height: 70),
+                Text(
+                  "Next appointment : 12.05.24",
+                  style: const TextStyle(
+                      fontSize: 25,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0x80000000)),
+                )
               ],
             ),
           ),
