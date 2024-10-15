@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
+import 'package:healthsyncycare/screens/patient/home_screen.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -11,7 +13,6 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
@@ -112,6 +113,16 @@ class _RegisterPageState extends State<RegisterPage> {
       setState(() {
         _selectedDoctorId = null;
       });
+
+      if (_isChecked) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => MyHomePage()),
+        );
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => MyHomePageDoctor()),
+        );
+      }
     } on FirebaseAuthException catch (e) {
       String errorMessage;
       if (e.code == 'weak-password') {
