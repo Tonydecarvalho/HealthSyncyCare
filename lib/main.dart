@@ -6,6 +6,7 @@ import 'package:healthsyncycare/screens/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/patient_condition_details.dart';
 import 'package:healthsyncycare/screens/patients_conditions_doctor.dart';
+import 'package:healthsyncycare/screens/register_screen.dart';
 import 'package:healthsyncycare/screens/sharedCondition.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -29,7 +30,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
-        home: LoginPage(),
+        home: RegisterPage(),
         routes: {
           '/home': (context) => MyHomePage(),
           '/appointment': (context) => AppointmentPage(
