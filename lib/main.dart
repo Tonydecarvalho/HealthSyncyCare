@@ -10,6 +10,7 @@ import 'package:healthsyncycare/screens/patient/sharedCondition.dart';
 import 'package:healthsyncycare/screens/doctor/create_prescription.dart';
 import 'package:healthsyncycare/screens/patient/condition_list.dart';
 import 'package:healthsyncycare/screens/patient/condition_details.dart';
+import 'package:healthsyncycare/screens/register_screen.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
@@ -36,7 +37,7 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
-        home: LoginPage(),
+        home: RegisterPage(),
         routes: {
           '/home': (context) => MyHomePage(),
           '/appointment': (context) => AppointmentPage(userId: 'user1'),
