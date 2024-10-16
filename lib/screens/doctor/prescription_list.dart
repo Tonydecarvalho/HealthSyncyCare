@@ -74,7 +74,7 @@ class _DoctorPrescriptionsHistoryPageState extends State<DoctorPrescriptionsHist
                           onTap: () {
                             Navigator.pushNamed(
                               context,
-                              '/prescription details',
+                              '/prescriptions details',
                               arguments: prescription.id,
                             );
                           },
