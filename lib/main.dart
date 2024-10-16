@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => LoginPage(), // Add the login page route here
           '/home': (context) => MyHomePage(),
-          '/appointment': (context) => AppointmentPage(userId: 'user1'),
+          '/appointment': (context) => AppointmentPage(),
           '/sharedCondition': (context) => SharedConditionPage(),
           '/patients conditions': (context) => PatientsConditions(),
           '/patient condition details': (context) => PatientConditionDetails(),
