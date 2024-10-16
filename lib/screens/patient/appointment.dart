@@ -2,7 +2,7 @@ import 'package:flutter/material.dart'; // Flutter framework for UI components
 import 'package:cloud_firestore/cloud_firestore.dart'; // Firestore for cloud-based database
 import 'package:firebase_auth/firebase_auth.dart'; // Firebase authentication for user management
 import 'package:table_calendar/table_calendar.dart'; // Calendar package to display date selector
-import '../email_service.dart'; // Custom service to send emails
+import '../../email_service.dart'; // Custom service to send emails
 
 class AppointmentPage extends StatefulWidget {
   const AppointmentPage({super.key});
