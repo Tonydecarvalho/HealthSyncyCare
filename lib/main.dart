@@ -1,12 +1,21 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:healthsyncycare/screens/home_screen.dart';
-import 'package:healthsyncycare/screens/appointment.dart';
-import 'package:healthsyncycare/screens/home_screen_doctor.dart';
+import 'package:healthsyncycare/screens/patient/home_screen.dart';
+import 'package:healthsyncycare/screens/patient/appointment.dart';
+import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
-import 'package:healthsyncycare/screens/patient_condition_details.dart';
-import 'package:healthsyncycare/screens/patients_conditions_doctor.dart';
-import 'package:healthsyncycare/screens/sharedCondition.dart';
+import 'package:healthsyncycare/screens/doctor/condition_details.dart';
+import 'package:healthsyncycare/screens/doctor/condition_list.dart';
+import 'package:healthsyncycare/screens/patient/sharedCondition.dart';
+import 'package:healthsyncycare/screens/doctor/create_prescription.dart';
+import 'package:healthsyncycare/screens/patient/condition_list.dart';
+import 'package:healthsyncycare/screens/patient/condition_details.dart';
+import 'package:healthsyncycare/screens/register_screen.dart';
+import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
+import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
+import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
+import 'package:healthsyncycare/screens/profile.dart';
+import 'package:healthsyncycare/screens/doctor/prescription_details.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -28,15 +37,35 @@ class MyApp extends StatelessWidget {
           useMaterial3: true,
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
-        home: LoginPage(),
+        initialRoute: '/login', // Initial route set to login page
         routes: {
+          '/login': (context) => LoginPage(), // Add the login page route here
           '/home': (context) => MyHomePage(),
-          '/appointment': (context) => AppointmentPage(
-                userId: 'user1',
-              ),
+          '/appointment': (context) => AppointmentPage(),
           '/sharedCondition': (context) => SharedConditionPage(),
           '/patients conditions': (context) => PatientsConditions(),
-          '/patient condition details': (context) => PatientConditionDetails()
+          '/patient condition details': (context) => PatientConditionDetails(),
+          '/doctor': (context) => MyHomePageDoctor(),
+          '/patients conditions patient': (context) => PatientsConditionsPatient(),
+          '/patient condition details patient': (context) => PatientConditionDetailsPatient(),
+          '/prescriptions list': (context) => PatientPrescriptionsPage(),
+          '/prescriptions details': (context) => PrescriptionDetailsPage(),
+          '/doctor prescriptions': (context) => DoctorPrescriptionsPage(),
+          '/doctor prescriptions list': (context) => DoctorPrescriptionsHistoryPage(),
+          '/profile': (context) => ProfilePage(),
+        },
+        onGenerateRoute: (settings) {
+          if (settings.name == '/create prescription') {
+            final args = settings.arguments as Map<String, String>;
+
+            return MaterialPageRoute(
+              builder: (context) => CreatePrescriptionPage(
+                patientId: args['patientId']!,
+                conditionId: args['conditionId']!,
+              ),
+            );
+          }
+          return null;
         },
         debugShowCheckedModeBanner: false,
       ),
@@ -44,4 +73,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class MyAppState extends ChangeNotifier {}
+// Définition de MyAppState pour la gestion d'état
+class MyAppState extends ChangeNotifier {
+  // Ajoutez les propriétés et méthodes nécessaires ici
+}

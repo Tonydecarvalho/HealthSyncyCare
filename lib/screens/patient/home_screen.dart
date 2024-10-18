@@ -1,6 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserName();
+  }
+
+  Future<void> _getUserName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if(user != null) {
+      final userId = user.uid;
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+      if(userDoc.exists){
+        setState(() {
+          userName = userDoc.data()?['name'];
+        });
+      }
+    }
+  }
+
+
   final List categoriesNames = [
     "Shared",
     "Appointments",
@@ -29,28 +59,26 @@ class MyHomePage extends StatelessWidget {
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
                 )),
-            child: Column(
+           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(
-                      Icons.dashboard,
-                      size: 30,
-                      color: Color(0xFFFFFFFF),
-                    ),
-                    const Icon(
-                      Icons.account_circle_sharp,
-                      size: 30,
-                      color: Color(0xFFFFFFFF),
+                    const Icon(Icons.dashboard, size: 30, color: Color(0xFFFFFFFF)),
+                    InkWell(
+                      onTap: () {
+                         Navigator.pushNamed(
+                                    context, '/profile');
+                      },
+                      child: const Icon(Icons.account_circle_sharp, size: 30, color: Color(0xFFFFFFFF)),
                     ),
                   ],
                 ),
                 const SizedBox(height: 20),
                 Padding(
                   padding: EdgeInsets.only(left: 3, bottom: 15),
-                  child: Text("Hello, John",
+                  child: Text("Hello, $userName",
                       style: const TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w600,
@@ -101,10 +129,12 @@ class MyHomePage extends StatelessWidget {
                                 break;
                               case 2:
                                 Navigator.pushNamed(
-                                    context, '/patients conditions');
+                                    context, '/patients conditions patient');
                                 print("Open History page");
                                 break;
                               case 3:
+                                Navigator.pushNamed(
+                                    context, '/prescriptions list');
                                 print("Open Prescription page");
                                 break;
                               default:
