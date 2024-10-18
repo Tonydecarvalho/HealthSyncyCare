@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
+import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -46,7 +47,6 @@ class _RegisterPageState extends State<RegisterPage> {
             .toList();
       });
     } catch (e) {
-      // Fetch errors
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to load doctors: $e')));
     }
@@ -94,7 +94,6 @@ class _RegisterPageState extends State<RegisterPage> {
         userData['doctorId'] = _selectedDoctorId;
       }
 
-      // Add information
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user?.uid)
@@ -152,12 +151,19 @@ class _RegisterPageState extends State<RegisterPage> {
         .pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
+  void _navigateToPrivacyPolicy() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
         title: Text("Sign Up"),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(26.0),
@@ -253,6 +259,18 @@ class _RegisterPageState extends State<RegisterPage> {
                     onPressed: _signUp,
                     child: Text("Sign Up"),
                   ),
+            const SizedBox(height: 20),
+            // Add Privacy Policy link here
+            TextButton(
+              onPressed: _navigateToPrivacyPolicy,
+              child: Text(
+                "Privacy Policy",
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
           ],
         ),
       ),
