@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
+import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
 import 'package:intl/intl.dart';  // Import the intl package for DateFormat
 
 class RegisterPage extends StatefulWidget {
@@ -174,6 +175,12 @@ class _RegisterPageState extends State<RegisterPage> {
         .pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
+  void _navigateToPrivacyPolicy() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
+    );
+  }
+
   Future<void> _selectDateOfBirth(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -194,6 +201,7 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Sign Up"),
+        automaticallyImplyLeading: false,
       ),
       body: Padding(
         padding: const EdgeInsets.all(26.0),
@@ -335,6 +343,18 @@ class _RegisterPageState extends State<RegisterPage> {
                       onPressed: _signUp,
                       child: Text("Sign Up"),
                     ),
+            const SizedBox(height: 20),
+            // Add Privacy Policy link here
+            TextButton(
+              onPressed: _navigateToPrivacyPolicy,
+              child: Text(
+                "Privacy Policy",
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
             ],
           ),
         ),

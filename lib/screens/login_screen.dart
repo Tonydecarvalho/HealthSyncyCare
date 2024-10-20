@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/register_screen.dart';
+import 'package:healthsyncycare/screens/privacy_policy.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -65,6 +66,12 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (context) => RegisterPage()));
   }
 
+  void _navigateToPrivacyPolicy() {
+    Navigator.of(context).push(MaterialPageRoute(
+        builder: (context) =>
+            PrivacyPolicyPage())); // Navigates to the Privacy Policy page
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,6 +113,19 @@ class _LoginPageState extends State<LoginPage> {
                     onPressed: _login,
                     child: Text('Login'),
                   ),
+            SizedBox(height: 20),
+            // Add the privacy policy link
+            TextButton(
+              onPressed:
+                  _navigateToPrivacyPolicy, // Navigates to the privacy policy
+              child: Text(
+                "Privacy Policy",
+                style: TextStyle(
+                  color: Colors.blue, // Set the color of the link
+                  decoration: TextDecoration.underline, // Underline the link
+                ),
+              ),
+            ),
           ],
         ),
       ),
