@@ -39,7 +39,7 @@ class PrescriptionDetailsPage extends StatelessWidget {
           final prescriptionData = prescriptionSnapshot.data!;
           final Timestamp timestamp = prescriptionData['createdAt'];
           final String formattedDate =
-              DateFormat('yyyy.MM.dd').format(timestamp.toDate());
+              DateFormat('dd.MM.yyyy').format(timestamp.toDate()); // Date format updated
 
           return Padding(
             padding: const EdgeInsets.all(20.0),
