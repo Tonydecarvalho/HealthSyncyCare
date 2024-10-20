@@ -95,10 +95,12 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
                         );
                       }
 
-                      final String userName = userSnapshot.data!['name'] ?? 'Unknown Patient';
+                      final String firstName = userSnapshot.data!['firstName'] ?? 'Unknown';
+                      final String lastName = userSnapshot.data!['lastName'] ?? 'Patient';
+                      final String fullName = "$firstName $lastName";
 
                       return _buildConditionCard(
-                        patientName: userName,
+                        patientName: fullName,
                         timestamp: conditionDoc['timestamp'],
                         onTap: () {
                           Navigator.pushNamed(
@@ -147,7 +149,7 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                  DateFormat('yyyy.MM.dd').format(timestamp.toDate()),
+                  DateFormat('dd.MM.yyyy').format(timestamp.toDate()), // Format updated to DD.MM.YYYY
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 18.0,
