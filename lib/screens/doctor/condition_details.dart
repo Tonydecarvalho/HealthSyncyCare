@@ -12,7 +12,7 @@ class PatientConditionDetails extends StatelessWidget {
     final String conditionId = conditionData.id;
     final Timestamp timestamp = conditionData['timestamp'];
     final String formattedDate =
-        DateFormat('yyyy.MM.dd - kk:mm').format(timestamp.toDate());
+        DateFormat('dd MMMM yyyy - HH:mm').format(timestamp.toDate());
 
     return Scaffold(
       appBar: AppBar(
@@ -38,19 +38,25 @@ class PatientConditionDetails extends StatelessWidget {
             return Center(child: Text("Patient not found"));
           }
 
-          final String patientName = snapshot.data!['name'];
+          final userData = snapshot.data!;
+          final String fullName = '${userData['firstName']} ${userData['lastName']}';
+          final String address = '${userData['address']}, ${userData['city']}, ${userData['postalCode']}, ${userData['country']}';
+          final String phone = userData['phone'] ?? 'N/A';
+          final String email = userData['email'];
+          final String gender = userData['gender'] ?? 'N/A';
+          final String dateOfBirth = DateFormat('dd MMMM yyyy').format(DateTime.parse(userData['dateOfBirth']));
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Patient name and condition date
+                // Patient details
                 Center(
                   child: Column(
                     children: [
                       Text(
-                        patientName,
+                        fullName,
                         style: TextStyle(
                           fontSize: 28.0,
                           fontWeight: FontWeight.bold,
@@ -59,7 +65,47 @@ class PatientConditionDetails extends StatelessWidget {
                       ),
                       SizedBox(height: 8.0),
                       Text(
+                        'Date of Birth: $dateOfBirth',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
                         formattedDate,
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Phone: $phone',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Email: $email',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Gender: $gender',
+                        style: TextStyle(
+                          fontSize: 18.0,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                      SizedBox(height: 8.0),
+                      Text(
+                        'Address: $address',
                         style: TextStyle(
                           fontSize: 18.0,
                           color: Colors.grey[600],
@@ -165,9 +211,10 @@ class PatientConditionDetails extends StatelessWidget {
                 children: [
                   Text(
                     description,
+                    textAlign: TextAlign.justify,
                     style: TextStyle(
-                      fontSize: 18.0,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.normal,
                       color: Color(0xFF333333),
                     ),
                   ),

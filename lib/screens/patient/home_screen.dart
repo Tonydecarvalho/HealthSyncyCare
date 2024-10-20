@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if(userDoc.exists){
         setState(() {
-          userName = userDoc.data()?['name'];
+          userName = userDoc.data()?['firstName'];
         });
       }
     }
