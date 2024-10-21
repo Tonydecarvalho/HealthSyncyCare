@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart'; // Import intl package for date formatting
-
 import 'book_appointment.dart'; // Import your booking page
 
 class ViewAppointmentPage extends StatefulWidget {
@@ -44,44 +43,57 @@ class _ViewAppointmentPageState extends State<ViewAppointmentPage> {
     }
   }
 
-  // Fetch upcoming appointments only for the logged-in user
-  Future<void> _fetchUpcomingAppointments() async {
-    setState(() => _isLoading = true);
-    try {
-      final now = DateTime.now();
-      final appointmentsSnapshot = await FirebaseFirestore.instance
-          .collection('BookAppointments')
-          .where('patientId', isEqualTo: _userId)
-          .where('appointmentDate', isGreaterThanOrEqualTo: now) // Only upcoming appointments
-          .orderBy('appointmentDate', descending: false) // Sort by date
+// Fetch upcoming appointments only for the logged-in user and with status == true
+Future<void> _fetchUpcomingAppointments() async {
+  setState(() => _isLoading = true);
+  try {
+    final now = DateTime.now();
+    final appointmentsSnapshot = await FirebaseFirestore.instance
+        .collection('BookAppointments')
+        .where('patientId', isEqualTo: _userId)
+        .where('status', isEqualTo: true) // Filter for confirmed appointments
+        .where('appointmentDate', isGreaterThanOrEqualTo: now) // Only upcoming appointments
+        .orderBy('appointmentDate', descending: false) // Sort by date
+        .get();
+
+    List<Map<String, dynamic>> appointments = [];
+
+    for (var doc in appointmentsSnapshot.docs) {
+      final data = doc.data();
+      final appointmentDate = (data['appointmentDate'] as Timestamp).toDate();
+      final status = 'Confirmed'; // Since we filter for true, status is always confirmed
+      final doctorId = data['doctorId']; // Get doctorId from the appointment
+
+      // Fetch doctor's details using the doctorId
+      final doctorDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(doctorId)
           .get();
+      final doctorFirstName = doctorDoc['firstName'];
+      final doctorLastName = doctorDoc['lastName'];
+      final doctorName = '$doctorFirstName $doctorLastName'; // Full name of the doctor
 
-      List<Map<String, dynamic>> appointments = [];
-
-      for (var doc in appointmentsSnapshot.docs) {
-        final data = doc.data();
-        final appointmentDate = (data['appointmentDate'] as Timestamp).toDate();
-        final status = data['status'] == true ? 'Confirmed' : 'Pending';
-
-        appointments.add({
-          'docId': doc.id, // Store document ID for cancellation
-          'date': appointmentDate,
-          'status': status,
-          'symptoms': data['symptoms'],
-        });
-      }
-
-      setState(() {
-        _upcomingAppointments = appointments;
+      appointments.add({
+        'docId': doc.id, // Store document ID for cancellation
+        'date': appointmentDate,
+        'status': status,
+        'symptoms': data['symptoms'],
+        'doctorName': doctorName, // Add doctor's name to the appointment data
       });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Error fetching appointments: $e")),
-      );
-    } finally {
-      setState(() => _isLoading = false);
     }
+
+    setState(() {
+      _upcomingAppointments = appointments;
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error fetching appointments: $e")),
+    );
+  } finally {
+    setState(() => _isLoading = false);
   }
+}
+
 
   // Function to format the date with the month name
   String formatDate(DateTime date) {
@@ -94,7 +106,7 @@ class _ViewAppointmentPageState extends State<ViewAppointmentPage> {
       await FirebaseFirestore.instance
           .collection('BookAppointments')
           .doc(docId)
-          .update({'status': false, 'patientId': null}); // Mark as vacant, remove patientId
+          .update({'status': false}); // Mark as vacant, remove patientId
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Appointment successfully canceled')),
@@ -139,12 +151,13 @@ class _ViewAppointmentPageState extends State<ViewAppointmentPage> {
     );
   }
 
-  // Function to build each appointment card with a cancel button
+  // Function to build each appointment card with an edit symptoms button
   Widget _buildAppointmentCard(Map<String, dynamic> appointment) {
     final DateTime appointmentDate = appointment['date'];
     final String status = appointment['status'];
     final String symptoms = appointment['symptoms'] ?? 'No symptoms provided';
-    final String docId = appointment['docId']; // Document ID for cancellation
+    final String docId = appointment['docId']; // Document ID for updating
+    final String doctorName = appointment['doctorName']; // Doctor's name
 
     return Card(
       margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
@@ -172,6 +185,11 @@ class _ViewAppointmentPageState extends State<ViewAppointmentPage> {
                   ),
                   const SizedBox(height: 5),
                   Text(
+                    'Doctor: $doctorName', // Display the doctor's name
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 5),
+                  Text(
                     'Symptoms: $symptoms',
                     style: const TextStyle(fontSize: 14, color: Colors.grey),
                   ),
@@ -187,17 +205,86 @@ class _ViewAppointmentPageState extends State<ViewAppointmentPage> {
                 ],
               ),
             ),
-            ElevatedButton(
-              onPressed: () => _showCancelConfirmationDialog(docId),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Set cancel button color to red
-              ),
-              child: const Text('Cancel'),
+            Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () => _showEditSymptomsDialog(docId, symptoms),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange, // Edit button color
+                  ),
+                  child: const Text('Edit Symptoms'),
+                ),
+                ElevatedButton(
+                  onPressed: () => _showCancelConfirmationDialog(docId),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red, // Set cancel button color to red
+                  ),
+                  child: const Text('Cancel'),
+                ),
+              ],
             ),
           ],
         ),
       ),
     );
+  }
+
+  // Function to show dialog to edit symptoms
+  Future<void> _showEditSymptomsDialog(String docId, String currentSymptoms) async {
+    final TextEditingController _symptomsController = TextEditingController(text: currentSymptoms);
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Edit Symptoms'),
+          content: TextField(
+            controller: _symptomsController,
+            maxLength: 200,
+            decoration: const InputDecoration(hintText: 'Enter new symptoms'),
+            maxLines: 3,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the dialog without saving
+              },
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                await _updateSymptoms(docId, _symptomsController.text); // Save the updated symptoms
+                Navigator.of(context).pop(); // Close the dialog after saving
+              },
+              child: const Text('Save'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // Function to update symptoms in Firestore
+  Future<void> _updateSymptoms(String docId, String newSymptoms) async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('BookAppointments')
+          .doc(docId)
+          .update({'symptoms': newSymptoms}); // Update symptoms field in Firestore
+
+      // Show success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Symptoms updated successfully!')),
+      );
+
+      // Refresh the appointments list
+      await _fetchUpcomingAppointments();
+    } catch (e) {
+      // Show error message
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to update symptoms: $e')),
+      );
+    }
   }
 
   // Function to build the list of appointments

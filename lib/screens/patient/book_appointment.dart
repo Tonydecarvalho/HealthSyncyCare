@@ -102,75 +102,81 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
     }
   }
 
-  // Function to save the selected appointment to Firestore
-  Future<void> _saveAppointment(String symptoms) async {
-    try {
-      if (_userId == null)
-        throw Exception('User ID not found'); // Ensure user ID is present
+// Function to save the selected appointment to Firestore
+Future<void> _saveAppointment(String symptoms) async {
+  try {
+    if (_userId == null)
+      throw Exception('User ID not found'); // Ensure user ID is present
 
-      DateTime appointmentDateTime = DateTime(
-        _selectedDay!.year,
-        _selectedDay!.month,
-        _selectedDay!.day,
-        int.parse(_selectedTime!
-            .split(':')[0]), // Parse selected time for the appointment
-        int.parse(_selectedTime!.split(':')[1]),
-      );
+    DateTime appointmentDateTime = DateTime(
+      _selectedDay!.year,
+      _selectedDay!.month,
+      _selectedDay!.day,
+      int.parse(_selectedTime!.split(':')[0]), // Parse selected time for the appointment
+      int.parse(_selectedTime!.split(':')[1]),
+    );
 
-      // Add new appointment to the database
-      await FirebaseFirestore.instance.collection('BookAppointments').add({
-        'appointmentDate':
-            Timestamp.fromDate(appointmentDateTime), // Store appointment date
-        'status': true, // Marking as booked
-        'symptoms': symptoms, // Store patient's symptoms
-        'patientId': _userId, // Associate appointment with logged-in user
-        'createdTime': Timestamp.now(), // Store appointment creation time
-      });
+    // Fetch the user document to get the doctorId
+    final userDoc = await FirebaseFirestore.instance.collection('users').doc(_userId).get();
+    String? doctorId = userDoc['doctorId'];
 
-      // Show a confirmation message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text(
-                'Appointment saved and marked as booked!')), // Success message
-      );
-
-// Send confirmation email to the user
-      final userDoc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(_userId)
-          .get();
-      final userName = userDoc['name']; // Get user's name
-      final userEmail = userDoc['email']; // Get user's email
-      final doctorId =
-          userDoc['doctorId']; // Get doctorId from the user's document
-
-// Fetch the doctor's information using the doctorId
-      final doctorDoc = await FirebaseFirestore.instance
-          .collection(
-              'users') // Replace with the correct collection for doctors
-          .doc(doctorId)
-          .get();
-      final doctorName = doctorDoc['name']; // Get doctor's name
-      final doctorEmail = doctorDoc['email']; // Get doctor's email
-
-// Send confirmation email to both the patient and the doctor
-      await sendConfirmationEmail(userEmail, userName, doctorEmail, doctorName,
-          appointmentDateTime); // Send confirmation emails
-
-      // Refresh the available times to reflect the newly booked appointment
-      await _fetchAvailableTimes();
-
-      setState(() {
-        _isSaving = false; // Reset saving state
-      });
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text(
-                "Error saving appointment: $e")), // Show error if saving fails
-      );
+    if (doctorId == null || doctorId.isEmpty) {
+      throw Exception('No doctorId assigned to this user.');
     }
+
+    // Add new appointment to the database with doctorId
+    await FirebaseFirestore.instance.collection('BookAppointments').add({
+      'appointmentDate': Timestamp.fromDate(appointmentDateTime), // Store appointment date
+      'status': true, // Marking as booked
+      'symptoms': symptoms, // Store patient's symptoms
+      'patientId': _userId, // Associate appointment with logged-in user
+      'doctorId': doctorId, // Save the doctorId associated with this appointment
+      'createdTime': Timestamp.now(), // Store appointment creation time
+    });
+
+    // Update user's document to store doctorId (if not already there)
+    await FirebaseFirestore.instance.collection('users').doc(_userId).update({
+      'doctorId': doctorId,
+    });
+
+    // Show a confirmation message
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Appointment saved and marked as booked!')), // Success message
+    );
+
+    // Fetch the doctor's information using the doctorId
+    final doctorDoc = await FirebaseFirestore.instance.collection('users').doc(doctorId).get();
+    final doctorFirstName = doctorDoc['firstName']; // Get doctor's first name
+    final doctorLastName = doctorDoc['lastName']; // Get doctor's last name
+    final doctorEmail = doctorDoc['email']; // Get doctor's email
+
+    // Send confirmation email to both the patient and the doctor
+    final firstName = userDoc['firstName'];
+    final lastName = userDoc['lastName'];
+    final userEmail = userDoc['email'];
+
+    await sendConfirmationEmail(
+      userEmail,
+      '$firstName $lastName', // Concatenate first and last names for the full name
+      doctorEmail,
+      '$doctorFirstName $doctorLastName', // Concatenate doctor's first and last names
+      appointmentDateTime,
+    );
+
+    // Refresh the available times to reflect the newly booked appointment
+    await _fetchAvailableTimes();
+
+    setState(() {
+      _isSaving = false; // Reset saving state
+    });
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error saving appointment: $e")), // Show error if saving fails
+    );
   }
+}
+
+
 
   // Function to generate available time slots for the selected day
   List<Map<String, dynamic>> _generateTimeSlots(DateTime day) {
