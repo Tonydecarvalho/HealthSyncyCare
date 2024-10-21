@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart'; // Firebase authentication fo
 import 'package:table_calendar/table_calendar.dart'; // Calendar package to display date selector
 import '../../email_service.dart'; // Custom service to send emails
 
-class AppointmentPage extends StatefulWidget {
-  const AppointmentPage({super.key});
+class BookAppointmentPage extends StatefulWidget {
+  const BookAppointmentPage({super.key});
 
   @override
-  _AppointmentPageState createState() => _AppointmentPageState();
+  _BookAppointmentPageState createState() => _BookAppointmentPageState();
 }
 
-class _AppointmentPageState extends State<AppointmentPage> {
+class _BookAppointmentPageState extends State<BookAppointmentPage> {
   CalendarFormat _calendarFormat =
       CalendarFormat.month; // Format of the calendar view
   DateTime _focusedDay =
@@ -134,16 +134,28 @@ class _AppointmentPageState extends State<AppointmentPage> {
                 'Appointment saved and marked as booked!')), // Success message
       );
 
-      // Send confirmation email to the user
+// Send confirmation email to the user
       final userDoc = await FirebaseFirestore.instance
           .collection('users')
           .doc(_userId)
           .get();
       final userName = userDoc['name']; // Get user's name
       final userEmail = userDoc['email']; // Get user's email
+      final doctorId =
+          userDoc['doctorId']; // Get doctorId from the user's document
 
-      await sendConfirmationEmail(
-          userEmail, userName, appointmentDateTime); // Send confirmation email
+// Fetch the doctor's information using the doctorId
+      final doctorDoc = await FirebaseFirestore.instance
+          .collection(
+              'users') // Replace with the correct collection for doctors
+          .doc(doctorId)
+          .get();
+      final doctorName = doctorDoc['name']; // Get doctor's name
+      final doctorEmail = doctorDoc['email']; // Get doctor's email
+
+// Send confirmation email to both the patient and the doctor
+      await sendConfirmationEmail(userEmail, userName, doctorEmail, doctorName,
+          appointmentDateTime); // Send confirmation emails
 
       // Refresh the available times to reflect the newly booked appointment
       await _fetchAvailableTimes();

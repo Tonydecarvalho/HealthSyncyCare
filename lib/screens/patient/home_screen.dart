@@ -94,7 +94,7 @@ class MyHomePage extends StatelessWidget {
                                 print("Open Share page");
                                 break;
                               case 1:
-                                Navigator.pushNamed(context, '/appointment');
+                                Navigator.pushNamed(context, '/viewAppointment');
                                 print("Open Appointments page");
                                 break;
                               case 2:
