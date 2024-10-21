@@ -16,6 +16,7 @@ import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
 import 'package:healthsyncycare/screens/profile.dart';
+import 'package:healthsyncycare/screens/doctor/prescription_details.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -51,6 +52,7 @@ class MyApp extends StatelessWidget {
           '/patient condition details patient': (context) => PatientConditionDetailsPatient(),
           '/prescriptions list': (context) => PatientPrescriptionsPage(),
           '/prescriptions details': (context) => PrescriptionDetailsPage(),
+          '/doctor prescriptions': (context) => DoctorPrescriptionsPage(),
           '/doctor prescriptions list': (context) => DoctorPrescriptionsHistoryPage(),
           '/profile': (context) => ProfilePage(),
         },

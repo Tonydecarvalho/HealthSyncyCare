@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart';
 
 class PatientsConditions extends StatefulWidget {
@@ -10,8 +11,11 @@ class PatientsConditions extends StatefulWidget {
 }
 
 class _PatientsConditionsPage extends State<PatientsConditions> {
-  final CollectionReference patientsConditions =
+  final CollectionReference usersCollection =
+      FirebaseFirestore.instance.collection("users");
+  final CollectionReference conditionsCollection =
       FirebaseFirestore.instance.collection("conditions");
+  final String? doctorId = FirebaseAuth.instance.currentUser?.uid;
 
   @override
   Widget build(BuildContext context) {
@@ -29,71 +33,82 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
         ),
       ),
       body: StreamBuilder(
-        stream: patientsConditions
-            .where('hasPrescription', isEqualTo: false) 
-            .snapshots(),
-        builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-          if (streamSnapshot.connectionState == ConnectionState.waiting) {
+        stream: usersCollection.where('doctorId', isEqualTo: doctorId).snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> patientSnapshot) {
+          if (patientSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (streamSnapshot.hasError) {
-            return Center(child: Text("Something went wrong"));
+          if (patientSnapshot.hasError || !patientSnapshot.hasData || patientSnapshot.data!.docs.isEmpty) {
+            return Center(child: Text("No patients found."));
           }
 
-          if (!streamSnapshot.hasData || streamSnapshot.data!.docs.isEmpty) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.list_alt_sharp,
-                    size: 70.0,
-                    color: Color(0xFF9E9E9E),
+          List<String> patientIds = patientSnapshot.data!.docs.map((doc) => doc.id).toList();
+
+          return StreamBuilder(
+            stream: conditionsCollection
+                .where('patientId', whereIn: patientIds)
+                .where('hasPrescription', isEqualTo: false)
+                .snapshots(),
+            builder: (context, AsyncSnapshot<QuerySnapshot> conditionSnapshot) {
+              if (conditionSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              if (conditionSnapshot.hasError || !conditionSnapshot.hasData || conditionSnapshot.data!.docs.isEmpty) {
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.list_alt_sharp,
+                        size: 70.0,
+                        color: Color(0xFF9E9E9E),
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        "No patient conditions found",
+                        style: TextStyle(fontSize: 20.0, color: Color(0xFF9E9E9E)),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 16.0),
-                  Text(
-                    "No patient conditions found",
-                    style: TextStyle(fontSize: 20.0, color: Color(0xFF9E9E9E)),
-                  ),
-                ],
-              ),
-            );
-          }
+                );
+              }
 
-          return ListView.builder(
-            itemCount: streamSnapshot.data!.docs.length,
-            itemBuilder: (context, index) {
-              final DocumentSnapshot conditionSnapshot = streamSnapshot.data!.docs[index];
-              final patientId = conditionSnapshot['patientId'];
+              return ListView.builder(
+                itemCount: conditionSnapshot.data!.docs.length,
+                itemBuilder: (context, index) {
+                  final DocumentSnapshot conditionDoc = conditionSnapshot.data!.docs[index];
+                  final String patientId = conditionDoc['patientId'];
 
-              return FutureBuilder<DocumentSnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(patientId)
-                    .get(),
-                builder: (context, userSnapshot) {
-                  if (userSnapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
-                  }
+                  return FutureBuilder<DocumentSnapshot>(
+                    future: usersCollection.doc(patientId).get(),
+                    builder: (context, userSnapshot) {
+                      if (userSnapshot.connectionState == ConnectionState.waiting) {
+                        return Center(child: CircularProgressIndicator());
+                      }
 
-                  if (userSnapshot.hasError || !userSnapshot.hasData || !userSnapshot.data!.exists) {
-                    return _buildConditionCard(
-                      patientName: 'Unknown Patient',
-                      timestamp: conditionSnapshot['timestamp'],
-                    );
-                  }
+                      if (userSnapshot.hasError || !userSnapshot.hasData || !userSnapshot.data!.exists) {
+                        return _buildConditionCard(
+                          patientName: 'Unknown Patient',
+                          timestamp: conditionDoc['timestamp'],
+                        );
+                      }
 
-                  final userName = userSnapshot.data!['name'] ?? 'Unknown Patient';
+                      final String firstName = userSnapshot.data!['firstName'] ?? 'Unknown';
+                      final String lastName = userSnapshot.data!['lastName'] ?? 'Patient';
+                      final String fullName = "$firstName $lastName";
 
-                  return _buildConditionCard(
-                    patientName: userName,
-                    timestamp: conditionSnapshot['timestamp'],
-                    onTap: () {
-                      Navigator.pushNamed(
-                        context,
-                        "/patient condition details",
-                        arguments: conditionSnapshot,
+                      return _buildConditionCard(
+                        patientName: fullName,
+                        timestamp: conditionDoc['timestamp'],
+                        onTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            "/patient condition details",
+                            arguments: conditionDoc,
+                          );
+                        },
                       );
                     },
                   );
@@ -134,7 +149,7 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
                 ),
                 SizedBox(height: 8.0),
                 Text(
-                  DateFormat('yyyy.MM.dd').format(timestamp.toDate()),
+                  DateFormat('dd.MM.yyyy').format(timestamp.toDate()), // Format updated to DD.MM.YYYY
                   style: TextStyle(
                     fontWeight: FontWeight.w500,
                     fontSize: 18.0,

@@ -1,7 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class MyHomePageDoctor extends StatelessWidget {
-  
+class MyHomePageDoctor extends StatefulWidget {
+  @override
+  MyHomePageDoctorState createState() => MyHomePageDoctorState();
+}
+
+class MyHomePageDoctorState extends State<MyHomePageDoctor> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserName();
+  }
+
+  Future<void> _getUserName() async {
+      final user = FirebaseAuth.instance.currentUser;
+    if(user != null) {
+      final userId = user.uid;
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+      if(userDoc.exists){
+        setState(() {
+          userName = userDoc.data()?['firstName'];
+        });
+      }
+    }
+  }
+
+
+
   final List categoriesNames = [
     "Patient",
     "Appointments",
@@ -58,7 +88,7 @@ class MyHomePageDoctor extends StatelessWidget {
                 const SizedBox(height: 20),
                 Padding(
                   padding: EdgeInsets.only(left: 3, bottom: 15),
-                  child: Text("Dr Jane,",
+                  child: Text("Dr $userName,",
                       style: const TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w600,
