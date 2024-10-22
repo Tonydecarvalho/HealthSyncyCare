@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
 import 'package:healthsyncycare/screens/patient/book_appointment.dart';
 import 'package:healthsyncycare/screens/patient/view_appointment.dart';
+import 'package:healthsyncycare/screens/doctor/view_appointment.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/doctor/condition_details.dart';
@@ -43,7 +44,8 @@ class MyApp extends StatelessWidget {
           '/login': (context) => LoginPage(), // Add the login page route here
           '/home': (context) => MyHomePage(),
           '/bookAppointment': (context) => BookAppointmentPage(),
-          '/viewAppointment': (context) => ViewAppointmentPage(),
+          '/viewPatientAppointment': (context) => ViewPatientAppointmentPage(),
+          '/viewDoctorAppointment': (context) => ViewDoctorAppointmentPage(),
           '/sharedCondition': (context) => SharedConditionPage(),
           '/patients conditions': (context) => PatientsConditions(),
           '/patient condition details': (context) => PatientConditionDetails(),

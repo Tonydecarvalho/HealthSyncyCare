@@ -4,14 +4,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:intl/intl.dart'; // Import intl package for date formatting
 import 'book_appointment.dart'; // Import your booking page
 
-class ViewAppointmentPage extends StatefulWidget {
-  const ViewAppointmentPage({super.key});
+class ViewPatientAppointmentPage extends StatefulWidget {
+  const ViewPatientAppointmentPage({super.key});
 
   @override
-  _ViewAppointmentPageState createState() => _ViewAppointmentPageState();
+  _ViewPatientAppointmentPageState createState() => _ViewPatientAppointmentPageState();
 }
 
-class _ViewAppointmentPageState extends State<ViewAppointmentPage> {
+class _ViewPatientAppointmentPageState extends State<ViewPatientAppointmentPage> {
   bool _isLoading = true;
   String? _userId;
   List<Map<String, dynamic>> _upcomingAppointments = [];

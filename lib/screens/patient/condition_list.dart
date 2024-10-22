@@ -7,122 +7,212 @@ class PatientsConditionsPatient extends StatefulWidget {
   const PatientsConditionsPatient({super.key});
 
   @override
-  State<PatientsConditionsPatient> createState() => _PatientsConditionsPatientState();
+  State<PatientsConditionsPatient> createState() =>
+      _PatientsConditionsPatientState();
 }
 
 class _PatientsConditionsPatientState extends State<PatientsConditionsPatient> {
-  final CollectionReference patientsConditions =
-      FirebaseFirestore.instance.collection("conditions");
-  final User? currentUser = FirebaseAuth.instance.currentUser;
+  final String? patientId = FirebaseAuth.instance.currentUser?.uid;
+  bool isDurationDescending = true; // To toggle symptom duration sorting
+  String searchQuery = ''; // Search query for filtering by symptom
+
+  // Toggle sorting order for symptom durations
+  void _toggleDurationSortOrder() {
+    setState(() {
+      isDurationDescending = !isDurationDescending;
+    });
+  }
+
+  // Function to handle search input change
+  void _onSearchChanged(String query) {
+    setState(() {
+      searchQuery = query.toLowerCase(); // Convert search query to lowercase for case-insensitive search
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Color(0xFF008000),
-        title: Text(
-          "Your Conditions",
+        backgroundColor: const Color(0xFF008000),
+        title: const Text(
+          'Your Conditions',
           style: TextStyle(
-              fontSize: 23.0,
-              fontWeight: FontWeight.w600,
-              color: Color(0xFFFFFFFF)),
+            fontSize: 23.0,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFFFFFFFF),
+          ),
         ),
       ),
-      body: currentUser == null
-          ? Center(child: Text("No user logged in"))
-          : StreamBuilder(
-              stream: patientsConditions
-                  .where('patientId', isEqualTo: currentUser!.uid)
-                  .snapshots(),
-              builder: (context, AsyncSnapshot<QuerySnapshot> streamSnapshot) {
-                if (streamSnapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-
-                if (streamSnapshot.hasError) {
-                  return Center(child: Text("Something went wrong"));
-                }
-
-                if (!streamSnapshot.hasData || streamSnapshot.data!.docs.isEmpty) {
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.history,
-                          size: 70.0,
-                          color: Color(0xFF9E9E9E),
-                        ),
-                        SizedBox(height: 16.0),
-                        Text(
-                          "No shared conditions found",
-                          style: TextStyle(fontSize: 20.0, color: Color(0xFF9E9E9E)),
-                        ),
-                      ],
-                    ),
-                  );
-                }
-
-                return ListView.builder(
-                  itemCount: streamSnapshot.data!.docs.length,
-                  itemBuilder: (context, index) {
-                    final DocumentSnapshot conditionSnapshot = streamSnapshot.data!.docs[index];
-                    return _buildConditionCard(
-                      timestamp: conditionSnapshot['timestamp'],
-                      conditionId: conditionSnapshot.id,
-                    );
-                  },
-                );
-              }),
-    );
-  }
-
-  Widget _buildConditionCard({
-    required Timestamp timestamp,
-    required String conditionId,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Material(
-        color: Color(0xFFFFFFFF),
-        elevation: 5.0,
-        borderRadius: BorderRadius.circular(20.0),
-        child: InkWell(
-          onTap: () {
-            Navigator.pushNamed(
-              context,
-              "/patient condition details patient",
-              arguments: conditionId,
-            );
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      body: Column(
+        children: [
+          // Search bar and sorting button
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            child: Row(
               children: [
-                Text(
-                  DateFormat('yyyy.MM.dd').format(timestamp.toDate()),
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24.0,
-                    color: Colors.black87,
+                // Search bar
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Search by Symptom',
+                      border: OutlineInputBorder(),
+                      prefixIcon: Icon(Icons.search),
+                    ),
+                    onChanged: _onSearchChanged, // Update search query when user types
                   ),
                 ),
-                SizedBox(height: 8.0),
-                Text(
-                  "View details",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18.0,
-                    color: Colors.grey[600],
+                const SizedBox(width: 10),
+                // Sorting button
+                IconButton(
+                  onPressed: _toggleDurationSortOrder,
+                  icon: Icon(
+                    isDurationDescending ? Icons.arrow_downward : Icons.arrow_upward,
+                    color: Color(0xFF008000),
                   ),
+                  tooltip: isDurationDescending ? 'Sort: Longest First' : 'Sort: Shortest First',
                 ),
               ],
             ),
           ),
-        ),
+          Expanded(
+            child: patientId == null
+                ? const Center(child: Text('Error: User not logged in.'))
+                : StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('conditions')
+                        .where('patientId', isEqualTo: patientId)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                      if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Center(
+                          child: Text('No conditions found.'),
+                        );
+                      }
+
+                      var conditions = snapshot.data!.docs;
+
+                      // Fetching symptom data and filtering based on search query
+                      return FutureBuilder<List<Map<String, dynamic>>>(
+                        future: _getConditionsWithSymptomData(conditions, searchQuery),
+                        builder: (context, futureSnapshot) {
+                          if (futureSnapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+
+                          if (!futureSnapshot.hasData || futureSnapshot.data!.isEmpty) {
+                            return const Center(child: Text('No conditions match your search.'));
+                          }
+
+                          // Sort conditions by max or min symptom duration
+                          var sortedConditions = futureSnapshot.data!;
+                          sortedConditions.sort((a, b) {
+                            final int durationA = a['maxDuration'] ?? 0;
+                            final int durationB = b['maxDuration'] ?? 0;
+                            return isDurationDescending
+                                ? durationB.compareTo(durationA)
+                                : durationA.compareTo(durationB);
+                          });
+
+                          return ListView.builder(
+                            itemCount: sortedConditions.length,
+                            itemBuilder: (context, index) {
+                              final condition = sortedConditions[index];
+                              final Timestamp timestamp = condition['timestamp'];
+                              final String formattedDate =
+                                  DateFormat('dd MMMM yyyy').format(timestamp.toDate());
+                              final String symptomNames = condition['symptomNames'] ?? 'No symptoms';
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                                child: Card(
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                  elevation: 5.0,
+                                  child: ListTile(
+                                    contentPadding: const EdgeInsets.all(20.0),
+                                    title: Text(
+                                      formattedDate,
+                                      style: const TextStyle(
+                                        fontSize: 20.0,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      "Symptoms: $symptomNames",
+                                      style: const TextStyle(
+                                        fontSize: 16.0,
+                                        color: Colors.black87,
+                                      ),
+                                    ),
+                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF008000)),
+                                    onTap: () {
+                                      Navigator.pushNamed(
+                                        context,
+                                        '/patient condition details patient',
+                                        arguments: condition['conditionId'],
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        },
+                      );
+                    },
+                  ),
+          ),
+        ],
       ),
     );
+  }
+
+  // Fetch symptom data for each condition, filter by search query, and return as a list of maps
+  Future<List<Map<String, dynamic>>> _getConditionsWithSymptomData(
+      List<QueryDocumentSnapshot> conditions, String searchQuery) async {
+    List<Map<String, dynamic>> conditionData = [];
+
+    for (var condition in conditions) {
+      final symptomsSnapshot = await condition.reference.collection('symptoms').get();
+      final symptoms = symptomsSnapshot.docs;
+
+      if (symptoms.isNotEmpty) {
+        final symptomNames = symptoms.map((symptom) => symptom['description']).join(', ');
+        final matchingSymptoms = symptoms
+            .where((symptom) =>
+                symptom['description'].toString().toLowerCase().contains(searchQuery))
+            .toList();
+        final maxDuration = symptoms.map((symptom) => symptom['duration']).reduce((a, b) => a > b ? a : b);
+
+        // If the condition has at least one symptom matching the search query, include it
+        if (searchQuery.isEmpty || matchingSymptoms.isNotEmpty) {
+          conditionData.add({
+            'conditionId': condition.id,
+            'timestamp': condition['timestamp'],
+            'symptomNames': symptomNames,
+            'maxDuration': maxDuration,
+          });
+        }
+      } else {
+        // If no symptoms are present, include the condition only if there's no search query
+        if (searchQuery.isEmpty) {
+          conditionData.add({
+            'conditionId': condition.id,
+            'timestamp': condition['timestamp'],
+            'symptomNames': 'No symptoms',
+            'maxDuration': 0,
+          });
+        }
+      }
+    }
+
+    return conditionData;
   }
 }

@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 print("Open Share page");
                                 break;
                               case 1:
-                                Navigator.pushNamed(context, '/viewAppointment');
+                                Navigator.pushNamed(context, '/viewPatientAppointment');
                                 print("Open Appointments page");
                                 break;
                               case 2:
