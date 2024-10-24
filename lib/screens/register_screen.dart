@@ -14,8 +14,16 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _genderController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _dateOfBirthController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController =
       TextEditingController();
@@ -26,15 +34,21 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isChecked = false;
 
   String? _selectedDoctorId; // Selected doctor id
+  String? _selectedDoctorFirstName;
+  String? _selectedDoctorLastName;
+  String? _selectedDoctorAddress;
+  String? _selectedDoctorPhoneNumber;
+
   List<Map<String, dynamic>> _doctors = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchDoctors(); // Fetch available doctors
+    _fetchDoctors();
   }
 
   Future<void> _fetchDoctors() async {
+    // Fetch available doctors
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -42,11 +56,17 @@ class _RegisterPageState extends State<RegisterPage> {
           .get();
       setState(() {
         _doctors = snapshot.docs
-            .map((doc) => {'id': doc.id, 'name': doc['name']})
+            .map((doc) => {
+                  'id': doc.id,
+                  'firstName': doc['firstName'],
+                  'lastName': doc['lastName'],
+                  'address': doc['address'],
+                  'phone': doc['phone']
+                })
             .toList();
       });
     } catch (e) {
-      // Fetch errors
+      // Errors
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to load doctors: $e')));
     }
@@ -84,8 +104,16 @@ class _RegisterPageState extends State<RegisterPage> {
 
       Map<String, dynamic> userData = {
         'name': _nameController.text,
+        'gender': _genderController.text,
+        'firstName': _firstNameController.text,
+        'lastName': _lastNameController.text,
+        'dateOfBirth': _dateOfBirthController.text,
+        'city': _cityController.text,
+        'postalCode': _postalCodeController.text,
         'email': _emailController.text.trim(),
         'address': _addressController.text,
+        'country': _countryController.text,
+        'phone': _phoneController.text,
         'role': _isChecked ? "patient" : "doctor",
         'createdAt': DateTime.now(),
       };
@@ -94,7 +122,6 @@ class _RegisterPageState extends State<RegisterPage> {
         userData['doctorId'] = _selectedDoctorId;
       }
 
-      // Add information
       await FirebaseFirestore.instance
           .collection('users')
           .doc(userCredential.user?.uid)
@@ -106,10 +133,19 @@ class _RegisterPageState extends State<RegisterPage> {
 
       // Reset form
       _nameController.clear();
+      _genderController.clear();
+      _firstNameController.clear();
+      _lastNameController.clear();
+      _dateOfBirthController.clear();
+      _cityController.clear();
+      _postalCodeController.clear();
       _emailController.clear();
       _addressController.clear();
+      _countryController.clear();
+      _phoneController.clear();
       _passwordController.clear();
       _repeatPasswordController.clear();
+
       setState(() {
         _selectedDoctorId = null;
       });
@@ -159,7 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
         centerTitle: true,
         title: Text("Sign Up"),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(26.0),
         child: Column(
           children: [
@@ -181,6 +217,30 @@ class _RegisterPageState extends State<RegisterPage> {
               decoration: InputDecoration(labelText: "Name"),
             ),
             TextField(
+              controller: _genderController,
+              decoration: InputDecoration(labelText: "Gender"),
+            ),
+            TextField(
+              controller: _firstNameController,
+              decoration: InputDecoration(labelText: "First name"),
+            ),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(labelText: "Last name"),
+            ),
+            TextField(
+              controller: _dateOfBirthController,
+              decoration: InputDecoration(labelText: "Date of birth"),
+            ),
+            TextField(
+              controller: _cityController,
+              decoration: InputDecoration(labelText: "City"),
+            ),
+            TextField(
+              controller: _postalCodeController,
+              decoration: InputDecoration(labelText: "Postal code"),
+            ),
+            TextField(
               controller: _emailController,
               decoration: InputDecoration(labelText: "Email"),
               keyboardType: TextInputType.emailAddress,
@@ -188,6 +248,14 @@ class _RegisterPageState extends State<RegisterPage> {
             TextField(
               controller: _addressController,
               decoration: InputDecoration(labelText: "Address"),
+            ),
+            TextField(
+              controller: _countryController,
+              decoration: InputDecoration(labelText: "Country"),
+            ),
+            TextField(
+              controller: _phoneController,
+              decoration: InputDecoration(labelText: "Phone"),
             ),
             TextField(
               controller: _passwordController,
@@ -217,17 +285,29 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-            Row(children: [
-              Checkbox(
-                value: _isChecked,
-                onChanged: (bool? newValue) {
-                  setState(() {
-                    _isChecked = newValue!;
-                  });
-                },
-              ),
-              Text("Patient"),
-            ]),
+            Row(
+              children: [
+                Checkbox(
+                  value: _isChecked,
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      _isChecked = newValue!;
+                      // Reset selected doctor
+                      if (!_isChecked) {
+                        _selectedDoctorId = null;
+                        _selectedDoctorFirstName = null;
+                        _selectedDoctorLastName = null;
+                        _selectedDoctorAddress = null;
+                        _selectedDoctorPhoneNumber = null;
+                      }
+                    });
+                  },
+                ),
+                Text("Patient"),
+              ],
+            ),
+
+// Display DropdownButton if true
             if (_isChecked) ...[
               DropdownButton<String>(
                 hint: Text("Select a Doctor"),
@@ -235,18 +315,50 @@ class _RegisterPageState extends State<RegisterPage> {
                 onChanged: (String? newValue) {
                   setState(() {
                     _selectedDoctorId = newValue;
+
+                    // Update selected doctor information
+                    var selectedDoctor = _doctors.firstWhere(
+                      (doctor) => doctor['id'] == newValue,
+                      orElse: () => {},
+                    );
+
+                    _selectedDoctorFirstName = selectedDoctor['firstName'];
+                    _selectedDoctorLastName = selectedDoctor['lastName'];
+                    _selectedDoctorAddress = selectedDoctor['address'];
+                    _selectedDoctorPhoneNumber = selectedDoctor['phone'];
                   });
                 },
                 items: _doctors.map<DropdownMenuItem<String>>(
                     (Map<String, dynamic> doctor) {
                   return DropdownMenuItem<String>(
                     value: doctor['id'],
-                    child: Text(doctor['name']),
+                    child: Text(doctor['firstName']),
                   );
                 }).toList(),
               ),
+
+              // Display selected doctor information
+              if (_selectedDoctorFirstName != null) ...[
+                SizedBox(height: 10.0),
+                Text(
+                  "Last name : $_selectedDoctorLastName",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "First name : $_selectedDoctorFirstName",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Address : $_selectedDoctorAddress",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Phone number : $_selectedDoctorPhoneNumber",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+              ],
             ],
-            SizedBox(height: 20),
+            SizedBox(height: 20.0),
             _isLoading
                 ? CircularProgressIndicator()
                 : ElevatedButton(
@@ -262,8 +374,16 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void dispose() {
     _nameController.dispose();
+    _genderController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
+    _dateOfBirthController.dispose();
+    _cityController.dispose();
+    _postalCodeController.dispose();
     _emailController.dispose();
     _addressController.dispose();
+    _countryController.dispose();
+    _phoneController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
     super.dispose();
