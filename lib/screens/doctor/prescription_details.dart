@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/services.dart';
 
-class PrescriptionDetailsPage extends StatelessWidget {
+class DoctorPrescriptionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final String prescriptionId =
@@ -39,7 +39,7 @@ class PrescriptionDetailsPage extends StatelessWidget {
           final prescriptionData = prescriptionSnapshot.data!;
           final Timestamp timestamp = prescriptionData['createdAt'];
           final String formattedDate =
-              DateFormat('dd.MM.yyyy').format(timestamp.toDate()); // Date format updated
+              DateFormat('dd.MM.yyyy').format(timestamp.toDate()); // Changed date format
 
           return Padding(
             padding: const EdgeInsets.all(20.0),
@@ -157,7 +157,6 @@ class PrescriptionDetailsPage extends StatelessWidget {
                 Center(
                   child: ElevatedButton.icon(
                     onPressed: () {
-                      // Afficher le dialogue de "simulation d'impression"
                       showDialog(
                         context: context,
                         builder: (BuildContext context) {
@@ -168,11 +167,9 @@ class PrescriptionDetailsPage extends StatelessWidget {
                             actions: [
                               TextButton(
                                 onPressed: () {
-                                  // Fermer le dialogue et rediriger vers la page d'accueil
-                                  Navigator.of(context)
-                                      .pop(); // Fermer le dialogue
+                                  Navigator.of(context).pop(); 
                                   Navigator.of(context).pushNamedAndRemoveUntil(
-                                    '/home', // Remplacez par votre route d'accueil
+                                    '/doctor', 
                                     (Route<dynamic> route) => false,
                                   );
                                 },

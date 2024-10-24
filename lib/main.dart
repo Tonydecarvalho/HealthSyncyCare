@@ -1,7 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
-import 'package:healthsyncycare/screens/patient/appointment.dart';
+import 'package:healthsyncycare/screens/patient/book_appointment.dart';
+import 'package:healthsyncycare/screens/patient/view_appointment.dart';
+import 'package:healthsyncycare/screens/doctor/view_appointment.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/doctor/condition_details.dart';
@@ -14,7 +16,9 @@ import 'package:healthsyncycare/screens/register_screen.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
-import 'package:healthsyncycare/screens/profile.dart';
+import 'package:healthsyncycare/screens/patient/profile.dart';
+import 'package:healthsyncycare/screens/doctor/profile.dart';
+import 'package:healthsyncycare/screens/doctor/prescription_details.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
@@ -51,7 +55,9 @@ class MyApp extends StatelessWidget {
         routes: {
           '/login': (context) => LoginPage(), // Add the login page route here
           '/home': (context) => MyHomePage(),
-          '/appointment': (context) => AppointmentPage(),
+          '/bookAppointment': (context) => BookAppointmentPage(),
+          '/viewPatientAppointment': (context) => ViewPatientAppointmentPage(),
+          '/viewDoctorAppointment': (context) => ViewDoctorAppointmentPage(),
           '/sharedCondition': (context) => SharedConditionPage(),
           '/patients conditions': (context) => PatientsConditions(),
           '/patient condition details': (context) => PatientConditionDetails(),
@@ -60,8 +66,10 @@ class MyApp extends StatelessWidget {
           '/patient condition details patient': (context) => PatientConditionDetailsPatient(),
           '/prescriptions list': (context) => PatientPrescriptionsPage(),
           '/prescriptions details': (context) => PrescriptionDetailsPage(),
+          '/doctor prescriptions': (context) => DoctorPrescriptionsPage(),
           '/doctor prescriptions list': (context) => DoctorPrescriptionsHistoryPage(),
           '/profile': (context) => ProfilePage(),
+          '/doctor profile': (context) => DoctorProfilePage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == '/create prescription') {

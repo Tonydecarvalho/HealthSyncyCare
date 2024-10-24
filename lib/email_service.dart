@@ -3,48 +3,71 @@ import 'package:http/http.dart'
 import 'dart:convert'; // Importing JSON package for encoding and decoding data
 import 'package:flutter_dotenv/flutter_dotenv.dart'; // Importing dotenv package to load environment variables
 
-// Function to send a confirmation email using Brevo API
 Future<void> sendConfirmationEmail(
-    String email, String name, DateTime appointmentDate) async {
+    String patientEmail, String patientName, String doctorEmail, String doctorName, DateTime appointmentDate) async {
   String apiKey =
       "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"; // Your Brevo API key (should ideally be stored securely)
-
-  final url = Uri.parse(
-      "https://api.brevo.com/v3/smtp/email"); // Brevo API URL for sending SMTP emails
+      
+  final url = Uri.parse("https://api.brevo.com/v3/smtp/email");
 
   final headers = {
-    "Content-Type": "application/json", // Setting content type to JSON
-    "api-key": apiKey, // Brevo API key in the header
+    "Content-Type": "application/json",
+    "api-key": apiKey,
   };
 
-  final body = jsonEncode({
-    "sender": {
-      "email": "bhe075@myy.haaga-helia.fi"
-    }, // The email address of the sender
+  // Email body for the patient
+  final patientEmailBody = jsonEncode({
+    "sender": {"email": "bhe075@myy.haaga-helia.fi"},
     "to": [
-      {"email": email, "name": name} // Recipient's email and name
+      {"email": patientEmail, "name": patientName}
     ],
-    "subject": "Appointment Confirmation", // Email subject
+    "subject": "Appointment Confirmation",
     "htmlContent": """
-      <h3>Dear $name,</h3>
+      <h3>Dear $patientName,</h3>
       <p>Your appointment is successfully booked for ${appointmentDate.toLocal().toString()}.</p>
       <p>Thank you!</p>
     """
   });
 
-  try {
-    final response = await http.post(url,
-        headers: headers, body: body); // Sending the POST request to Brevo API
+  // Email body for the doctor
+  final doctorEmailBody = jsonEncode({
+    "sender": {"email": "bhe075@myy.haaga-helia.fi"},
+    "to": [
+      {"email": doctorEmail, "name": doctorName}
+    ],
+    "subject": "New Appointment Scheduled",
+    "htmlContent": """
+      <h3>Dear Dr. $doctorName,</h3>
+      <p>An appointment has been scheduled with the following details:</p>
+      <ul>
+        <li><strong>Patient Name:</strong> $patientName</li>
+        <li><strong>Appointment Date:</strong> ${appointmentDate.toLocal().toString()}</li>
+      </ul>
+      <p>Thank you!</p>
+    """
+  });
 
-    if (response.statusCode == 201) {
-      print(
-          'Email sent successfully'); // Success message on successful email send
+  try {
+    // Send email to patient
+    final patientResponse = await http.post(url, headers: headers, body: patientEmailBody);
+
+    if (patientResponse.statusCode == 201) {
+      print('Patient email sent successfully');
     } else {
-      print(
-          'Failed to send email: ${response.body}'); // Error message with response body if sending fails
+      print('Failed to send patient email: ${patientResponse.statusCode}');
+      print('Response body: ${patientResponse.body}');
+    }
+
+    // Send email to doctor
+    final doctorResponse = await http.post(url, headers: headers, body: doctorEmailBody);
+
+    if (doctorResponse.statusCode == 201) {
+      print('Doctor email sent successfully');
+    } else {
+      print('Failed to send doctor email: ${doctorResponse.statusCode}');
+      print('Response body: ${doctorResponse.body}');
     }
   } catch (e) {
-    print(
-        'Error sending email: $e'); // Catching and printing any exceptions during the request
+    print('Error sending email: $e');
   }
 }

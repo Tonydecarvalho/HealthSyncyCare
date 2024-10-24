@@ -1,6 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  String userName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    _getUserName();
+  }
+
+  Future<void> _getUserName() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if(user != null) {
+      final userId = user.uid;
+      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+
+      if(userDoc.exists){
+        setState(() {
+          userName = userDoc.data()?['firstName'];
+        });
+      }
+    }
+  }
+
+
   final List categoriesNames = [
     "Shared",
     "Appointments",
@@ -63,7 +93,7 @@ class MyHomePage extends StatelessWidget {
                 const SizedBox(height: 20),
                 Padding(
                   padding: EdgeInsets.only(left: 3, bottom: 15),
-                  child: Text("Hello, John",
+                  child: Text("Hello, $userName",
                       style: const TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w600,
@@ -109,7 +139,7 @@ class MyHomePage extends StatelessWidget {
                                 print("Open Share page");
                                 break;
                               case 1:
-                                Navigator.pushNamed(context, '/appointment');
+                                Navigator.pushNamed(context, '/viewPatientAppointment');
                                 print("Open Appointments page");
                                 break;
                               case 2:
