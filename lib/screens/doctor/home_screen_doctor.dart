@@ -46,7 +46,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
     ),
     const Icon(
       Icons.calendar_month_sharp,
-      color: Color(0xFFA9A9A9), 
+      color: Color(0xFF008000), 
       size: 80
     ),
     const Icon(
