@@ -16,7 +16,8 @@ import 'package:healthsyncycare/screens/register_screen.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
-import 'package:healthsyncycare/screens/profile.dart';
+import 'package:healthsyncycare/screens/patient/profile.dart';
+import 'package:healthsyncycare/screens/doctor/profile.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_details.dart';
 import 'package:provider/provider.dart';
 
@@ -57,6 +58,7 @@ class MyApp extends StatelessWidget {
           '/doctor prescriptions': (context) => DoctorPrescriptionsPage(),
           '/doctor prescriptions list': (context) => DoctorPrescriptionsHistoryPage(),
           '/profile': (context) => ProfilePage(),
+          '/doctor profile': (context) => DoctorProfilePage(),
         },
         onGenerateRoute: (settings) {
           if (settings.name == '/create prescription') {
