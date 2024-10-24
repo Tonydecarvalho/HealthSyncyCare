@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfilePage extends StatelessWidget {
@@ -31,6 +32,12 @@ class ProfilePage extends StatelessWidget {
     }
 
     return userData;
+  }
+
+  void _navigateToPrivacyPolicy(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
+    ); // Navigates to the Privacy Policy page
   }
 
   @override
@@ -93,8 +100,22 @@ class ProfilePage extends StatelessWidget {
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.red,
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+                  padding:
+                    const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
                 ),
+            ),
+            const SizedBox(height: 20),
+            // Add the privacy policy link here
+            TextButton(
+              onPressed: () => _navigateToPrivacyPolicy(
+                  context), // Navigates to the Privacy Policy page
+              child: Text(
+                "Privacy Policy",
+                style: TextStyle(
+                  color: Colors.blue, // Set the color of the link
+                  decoration: TextDecoration.underline, // Underline the link
+                ),
+              ),
                 child: const Text('Logout'),
               ),
             ],

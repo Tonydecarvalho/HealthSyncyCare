@@ -24,7 +24,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
 
       if(userDoc.exists){
         setState(() {
-          userName = userDoc.data()?['name'];
+          userName = userDoc.data()?['firstName'];
         });
       }
     }
@@ -134,6 +134,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                                 print("Open Patient page");
                                 break;
                               case 1:
+                              Navigator.pushNamed(context, '/viewDoctorAppointment');
                                 print("Open Appointments page");
                                 break;
                               case 2:

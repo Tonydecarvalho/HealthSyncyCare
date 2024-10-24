@@ -4,6 +4,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
+import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
+import 'package:intl/intl.dart';  // Import the intl package for DateFormat
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -21,12 +23,18 @@ class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController =
-      TextEditingController();
+  final TextEditingController _repeatPasswordController = TextEditingController();
+
+  String? _selectedGender;
+  DateTime? _selectedDateOfBirth;
+  bool _isChecked = false; // Is user a patient?
+  String? _selectedDoctorId; // Selected doctor id
+  List<Map<String, dynamic>> _doctors = [];
 
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -96,8 +104,8 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      UserCredential userCredential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
@@ -111,6 +119,7 @@ class _RegisterPageState extends State<RegisterPage> {
         'city': _cityController.text,
         'postalCode': _postalCodeController.text,
         'email': _emailController.text.trim(),
+        'phone': _phoneController.text,
         'address': _addressController.text,
         'country': _countryController.text,
         'phone': _phoneController.text,
@@ -183,9 +192,47 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  void _clearFields() {
+    _firstNameController.clear();
+    _lastNameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _addressController.clear();
+    _cityController.clear();
+    _postalCodeController.clear();
+    _countryController.clear();
+    _passwordController.clear();
+    _repeatPasswordController.clear();
+    setState(() {
+      _selectedDoctorId = null;
+      _selectedDateOfBirth = null;
+      _selectedGender = null;
+    });
+  }
+
   void _navigateToLogin() {
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
+  }
+
+  void _navigateToPrivacyPolicy() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
+    );
+  }
+
+  Future<void> _selectDateOfBirth(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime(2000),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null && picked != _selectedDateOfBirth) {
+      setState(() {
+        _selectedDateOfBirth = picked;
+      });
+    }
   }
 
   @override
@@ -194,6 +241,7 @@ class _RegisterPageState extends State<RegisterPage> {
       appBar: AppBar(
         centerTitle: true,
         title: Text("Sign Up"),
+        automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(26.0),
@@ -381,6 +429,7 @@ class _RegisterPageState extends State<RegisterPage> {
     _cityController.dispose();
     _postalCodeController.dispose();
     _emailController.dispose();
+    _phoneController.dispose();
     _addressController.dispose();
     _countryController.dispose();
     _phoneController.dispose();

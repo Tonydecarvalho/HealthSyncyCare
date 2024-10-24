@@ -39,7 +39,7 @@ class DoctorPrescriptionsPage extends StatelessWidget {
           final prescriptionData = prescriptionSnapshot.data!;
           final Timestamp timestamp = prescriptionData['createdAt'];
           final String formattedDate =
-              DateFormat('yyyy.MM.dd').format(timestamp.toDate());
+              DateFormat('dd.MM.yyyy').format(timestamp.toDate()); // Changed date format
 
           return Padding(
             padding: const EdgeInsets.all(20.0),
@@ -167,8 +167,7 @@ class DoctorPrescriptionsPage extends StatelessWidget {
                             actions: [
                               TextButton(
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); 
+                                  Navigator.of(context).pop(); 
                                   Navigator.of(context).pushNamedAndRemoveUntil(
                                     '/doctor', 
                                     (Route<dynamic> route) => false,

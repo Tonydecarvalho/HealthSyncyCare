@@ -35,6 +35,8 @@ flutter_icons:
   image_path: "assets/icon/icon.png"
 
 flutter:
+  assets:
+    - assets/privacy_policy.json
   uses-material-design: true
 
 flutter_launcher_icons:

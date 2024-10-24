@@ -33,42 +33,37 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
     }
   }
 
+  Future<void> _saveConditions() async {
+    if (_symptoms.isEmpty) return;
 
-Future<void> _saveConditions() async {
-  if (_symptoms.isEmpty) return;
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: User not logged in.')),
+      );
+      return;
+    }
 
-  // Récupérer l'utilisateur actuellement connecté
-  final user = FirebaseAuth.instance.currentUser;
-  if (user == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Error: User not logged in.')),
-    );
-    return;
+    final patientId = user.uid;
+    final conditionRef = FirebaseFirestore.instance.collection('conditions').doc();
+    final timestamp = Timestamp.now();
+
+    await conditionRef.set({
+      'patientId': patientId,
+      'timestamp': timestamp,
+      'hasPrescription': false, // Initialement sans prescription
+    });
+
+    for (var symptom in _symptoms) {
+      await conditionRef.collection('symptoms').add(symptom);
+    }
+
+    setState(() {
+      _symptoms.clear();
+    });
+
+    _showSubmissionSuccessDialog();
   }
-
-  final patientId = user.uid;
-  final conditionRef = FirebaseFirestore.instance.collection('conditions').doc();
-  final timestamp = Timestamp.now();
-
-  // Ajouter le document principal de la condition avec `hasPrescription` à `false`
-  await conditionRef.set({
-    'patientId': patientId,
-    'timestamp': timestamp,
-    'hasPrescription': false, // Initialement sans prescription
-  });
-
-  // Ajouter chaque symptôme comme sous-collection
-  for (var symptom in _symptoms) {
-    await conditionRef.collection('symptoms').add(symptom);
-  }
-
-  setState(() {
-    _symptoms.clear();
-  });
-
-  _showSubmissionSuccessDialog();
-}
-
 
   void _showSubmissionSuccessDialog() {
     showDialog(
@@ -110,11 +105,13 @@ Future<void> _saveConditions() async {
               style: TextStyle(fontSize: 16, fontStyle: FontStyle.italic),
             ),
             SizedBox(height: 20),
-            // Symptom Description Text Field
-            TextField(
+            // Symptom Description Text Form Field (Multi-line input)
+            TextFormField(
               controller: _descriptionController,
+              maxLines: 5, // Allow up to 5 lines for long text input
               decoration: InputDecoration(
                 labelText: 'Symptom description',
+                alignLabelWithHint: true, // Aligns label with the top of the box
                 filled: true,
                 fillColor: Colors.grey[200],
                 border: OutlineInputBorder(

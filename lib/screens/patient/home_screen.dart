@@ -24,7 +24,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       if(userDoc.exists){
         setState(() {
-          userName = userDoc.data()?['name'];
+          userName = userDoc.data()?['firstName'];
         });
       }
     }
@@ -124,7 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 print("Open Share page");
                                 break;
                               case 1:
-                                Navigator.pushNamed(context, '/appointment');
+                                Navigator.pushNamed(context, '/viewPatientAppointment');
                                 print("Open Appointments page");
                                 break;
                               case 2:
