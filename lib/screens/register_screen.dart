@@ -352,7 +352,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   setState(() {
                     _selectedDoctorId = newValue;
 
-                    // Update selected doctor information
+                    // Mettre à jour les informations du médecin sélectionné
                     var selectedDoctor = _doctors.firstWhere(
                       (doctor) => doctor['id'] == newValue,
                       orElse: () => {},
@@ -365,12 +365,16 @@ class _RegisterPageState extends State<RegisterPage> {
                   });
                 },
                 items: _doctors.map<DropdownMenuItem<String>>(
-                    (Map<String, dynamic> doctor) {
-                  return DropdownMenuItem<String>(
-                    value: doctor['id'],
-                    child: Text(doctor['firstName']),
-                  );
-                }).toList(),
+                  (Map<String, dynamic> doctor) {
+                    // Concatenating first and last name to show full name
+                    String fullName =
+                        "${doctor['firstName']} ${doctor['lastName']}";
+                    return DropdownMenuItem<String>(
+                      value: doctor['id'],
+                      child: Text(fullName),
+                    );
+                  },
+                ).toList(),
               ),
 
               // Display selected doctor information

@@ -79,7 +79,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                     InkWell(
                       onTap: () {
                          Navigator.pushNamed(
-                                    context, '/profile');
+                                    context, '/doctor profile');
                       },
                       child: const Icon(Icons.account_circle_sharp, size: 30, color: Color(0xFFFFFFFF)),
                     ),

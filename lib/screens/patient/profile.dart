@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart'; // Import intl for date formatting
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -134,6 +135,17 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildUserInfoCard(Map<String, dynamic> userData) {
+    // Format date of birth
+    String formattedDateOfBirth = ' - ';
+    if (userData['dateOfBirth'] != null) {
+      try {
+        DateTime dob = DateTime.parse(userData['dateOfBirth']);
+        formattedDateOfBirth = DateFormat('dd.MM.yyyy').format(dob);
+      } catch (e) {
+        formattedDateOfBirth = 'Invalid Date';
+      }
+    }
+
     return Card(
       elevation: 4.0,
       child: Padding(
@@ -150,7 +162,7 @@ class ProfilePage extends StatelessWidget {
             Text('Last Name : ${userData['lastName'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Date of Birth : ${userData['dateOfBirth'] ?? ' - '}',
+            Text('Date of Birth : $formattedDateOfBirth',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
             Text('Address : ${userData['address'] ?? ' - '}',
@@ -174,6 +186,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildDoctorInfoCard(Map<String, dynamic> doctorData) {
+    final String fullName = '${doctorData['firstName'] ?? ' - '} ${doctorData['lastName'] ?? ' - '}';
+
     return Card(
       elevation: 4.0,
       child: Padding(
@@ -184,7 +198,7 @@ class ProfilePage extends StatelessWidget {
             const Text('My doctor',
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10.0),
-            Text('Name : ${doctorData['firstName'] ?? ' - '}',
+            Text('Name : $fullName',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
             Text('Phone : ${doctorData['phone'] ?? ' - '}',
