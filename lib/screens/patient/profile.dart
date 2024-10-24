@@ -45,6 +45,81 @@ class ProfilePage extends StatelessWidget {
     ); // Navigates to the Privacy Policy page
   }
 
+  Future<void> _deleteAccount(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final TextEditingController _confirmationController =
+        TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Are you sure you want to delete your account?'),
+              const SizedBox(height: 10),
+              const Text('Type "delete" to confirm:'),
+              TextField(
+                controller: _confirmationController,
+                decoration: const InputDecoration(
+                  labelText: 'Confirmation',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (_confirmationController.text.toLowerCase() == 'delete') {
+                  try {
+                    // Delete BookAppointments for the user
+                    final uid = user?.uid;
+                    if (uid != null) {
+                      // Delete appointments where patientId matches
+                      await FirebaseFirestore.instance
+                          .collection('BookAppointments')
+                          .where('patientId', isEqualTo: uid)
+                          .get()
+                          .then((querySnapshot) {
+                        for (var doc in querySnapshot.docs) {
+                          doc.reference.delete(); // Delete each appointment
+                        }
+                      });
+                    }
+
+                    // Delete the user account from Firebase Auth
+                    await user?.delete();
+
+                    // Log the user out and redirect to login screen
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please type "delete" to confirm')),
+                  );
+                }
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -105,6 +180,8 @@ class ProfilePage extends StatelessWidget {
                   ? _buildDoctorInfoCard(doctorData)
                   : _buildNoDoctorInfo(),
               const SizedBox(height: 15.0),
+
+              // Logout button
               ElevatedButton(
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
@@ -114,11 +191,25 @@ class ProfilePage extends StatelessWidget {
                 ),
                 child: const Text('Logout'),
               ),
+
+              const SizedBox(height: 10.0),
+
+              // Delete Account button
+              ElevatedButton(
+                onPressed: () => _deleteAccount(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 15.0),
+                ),
+                child: const Text('Delete Account'),
+              ),
+
               const SizedBox(height: 20),
-              // Add the privacy policy link here
+
+              // Add the privacy policy link
               TextButton(
-                onPressed: () => _navigateToPrivacyPolicy(
-                    context), // Navigates to the Privacy Policy page
+                onPressed: () => _navigateToPrivacyPolicy(context),
                 child: Text(
                   "Privacy Policy",
                   style: TextStyle(
@@ -186,7 +277,8 @@ class ProfilePage extends StatelessWidget {
   }
 
   Widget _buildDoctorInfoCard(Map<String, dynamic> doctorData) {
-    final String fullName = '${doctorData['firstName'] ?? ' - '} ${doctorData['lastName'] ?? ' - '}';
+    final String fullName =
+        '${doctorData['firstName'] ?? ' - '} ${doctorData['lastName'] ?? ' - '}';
 
     return Card(
       elevation: 4.0,
@@ -198,8 +290,7 @@ class ProfilePage extends StatelessWidget {
             const Text('My doctor',
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10.0),
-            Text('Name : $fullName',
-                style: const TextStyle(fontSize: 16.0)),
+            Text('Name : $fullName', style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
             Text('Phone : ${doctorData['phone'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
