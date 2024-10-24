@@ -5,7 +5,7 @@ import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
 import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
-import 'package:intl/intl.dart';  // Import the intl package for DateFormat
+import 'package:intl/intl.dart'; // Import the intl package for DateFormat
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -17,24 +17,31 @@ class RegisterPage extends StatefulWidget {
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
 
   String? _selectedGender;
   DateTime? _selectedDateOfBirth;
-  bool _isChecked = false; // Is user a patient?
-  String? _selectedDoctorId; // Selected doctor id
-  List<Map<String, dynamic>> _doctors = [];
 
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureRepeatPassword = true;
+  bool _isChecked = false; // Is user a patient?
+
+  String? _selectedDoctorId; // Selected doctor id
+  String? _selectedDoctorFirstName;
+  String? _selectedDoctorLastName;
+  String? _selectedDoctorAddress;
+  String? _selectedDoctorPhoneNumber;
+
+  List<Map<String, dynamic>> _doctors = [];
 
   @override
   void initState() {
@@ -50,10 +57,17 @@ class _RegisterPageState extends State<RegisterPage> {
           .get();
       setState(() {
         _doctors = snapshot.docs
-            .map((doc) => {'id': doc.id, 'name': '${doc['firstName']} ${doc['lastName']}'})
+            .map((doc) => {
+                  'id': doc.id,
+                  'firstName': doc['firstName'],
+                  'lastName': doc['lastName'],
+                  'address': doc['address'],
+                  'phone': doc['phone']
+                })
             .toList();
       });
     } catch (e) {
+      // Errors
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Failed to load doctors: $e')));
     }
@@ -83,23 +97,23 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
       Map<String, dynamic> userData = {
+        'gender': _selectedGender,
         'firstName': _firstNameController.text,
         'lastName': _lastNameController.text,
+        'dateOfBirth': _selectedDateOfBirth?.toIso8601String(),
+        'city': _cityController.text,
+        'postalCode': _postalCodeController.text,
         'email': _emailController.text.trim(),
         'phone': _phoneController.text,
         'address': _addressController.text,
-        'city': _cityController.text,
-        'postalCode': _postalCodeController.text,
         'country': _countryController.text,
-        'gender': _selectedGender,
-        'dateOfBirth': _selectedDateOfBirth?.toIso8601String(),
         'role': _isChecked ? "patient" : "doctor",
         'createdAt': DateTime.now(),
       };
@@ -117,6 +131,7 @@ class _RegisterPageState extends State<RegisterPage> {
         SnackBar(content: Text("User Registered Successfully")),
       );
 
+      // Reset form
       _clearFields();
 
       if (_isChecked) {
@@ -203,147 +218,183 @@ class _RegisterPageState extends State<RegisterPage> {
         title: Text("Sign Up"),
         automaticallyImplyLeading: false,
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(26.0),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Already have an account?"),
-                  TextButton(
-                    onPressed: _navigateToLogin,
-                    child: Text(
-                      "Login",
-                      style: TextStyle(color: Theme.of(context).primaryColor),
-                    ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text("Already have an account?"),
+                TextButton(
+                  onPressed: _navigateToLogin,
+                  child: Text(
+                    "Login",
+                    style: TextStyle(color: Theme.of(context).primaryColor),
                   ),
-                ],
+                ),
+              ],
+            ),
+            DropdownButtonFormField<String>(
+              decoration: InputDecoration(labelText: "Gender"),
+              value: _selectedGender,
+              items: ['Male', 'Female', 'Other'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedGender = newValue;
+                });
+              },
+            ),
+            TextField(
+              controller: _firstNameController,
+              decoration: InputDecoration(labelText: "First name"),
+            ),
+            TextField(
+              controller: _lastNameController,
+              decoration: InputDecoration(labelText: "Last name"),
+            ),
+            TextFormField(
+              readOnly: true,
+              onTap: () => _selectDateOfBirth(context),
+              decoration: InputDecoration(
+                labelText: _selectedDateOfBirth == null
+                    ? 'Date of Birth'
+                    : 'Date of Birth: ${DateFormat.yMd().format(_selectedDateOfBirth!)}',
+                suffixIcon: Icon(Icons.calendar_today),
               ),
-              TextField(
-                controller: _firstNameController,
-                decoration: InputDecoration(labelText: "First Name"),
-              ),
-              TextField(
-                controller: _lastNameController,
-                decoration: InputDecoration(labelText: "Last Name"),
-              ),
-              TextField(
-                controller: _emailController,
-                decoration: InputDecoration(labelText: "Email"),
-                keyboardType: TextInputType.emailAddress,
-              ),
-              TextField(
+            ),
+            TextField(
+              controller: _cityController,
+              decoration: InputDecoration(labelText: "City"),
+            ),
+            TextField(
+              controller: _postalCodeController,
+              decoration: InputDecoration(labelText: "Postal code"),
+            ),
+            TextField(
+              controller: _emailController,
+              decoration: InputDecoration(labelText: "Email"),
+              keyboardType: TextInputType.emailAddress,
+            ),
+            TextField(
+              controller: _addressController,
+              decoration: InputDecoration(labelText: "Street Address"),
+            ),
+            TextField(
+              controller: _countryController,
+              decoration: InputDecoration(labelText: "Country"),
+            ),
+            TextField(
                 controller: _phoneController,
-                decoration: InputDecoration(labelText: "Phone Number"),
-                keyboardType: TextInputType.phone,
-              ),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(labelText: "Gender"),
-                value: _selectedGender,
-                items: ['Male', 'Female', 'Other'].map((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _selectedGender = newValue;
-                  });
-                },
-              ),
-              TextFormField(
-                readOnly: true,
-                onTap: () => _selectDateOfBirth(context),
-                decoration: InputDecoration(
-                  labelText: _selectedDateOfBirth == null
-                      ? 'Date of Birth'
-                      : 'Date of Birth: ${DateFormat.yMd().format(_selectedDateOfBirth!)}',
-                  suffixIcon: Icon(Icons.calendar_today),
+                decoration: InputDecoration(labelText: "Phone"),
+                keyboardType: TextInputType.phone),
+            TextField(
+              controller: _passwordController,
+              obscureText: _obscurePassword,
+              decoration: InputDecoration(
+                labelText: "Password",
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility : Icons.visibility_off,
+                  ),
+                  onPressed: _togglePasswordVisibility,
                 ),
               ),
-              TextField(
-                controller: _addressController,
-                decoration: InputDecoration(labelText: "Street Address"),
-              ),
-              TextField(
-                controller: _cityController,
-                decoration: InputDecoration(labelText: "City"),
-              ),
-              TextField(
-                controller: _postalCodeController,
-                decoration: InputDecoration(labelText: "Postal Code"),
-              ),
-              TextField(
-                controller: _countryController,
-                decoration: InputDecoration(labelText: "Country"),
-              ),
-              TextField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  labelText: "Password",
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: _togglePasswordVisibility,
+            ),
+            TextField(
+              controller: _repeatPasswordController,
+              obscureText: _obscureRepeatPassword,
+              decoration: InputDecoration(
+                labelText: "Repeat Password",
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscureRepeatPassword
+                        ? Icons.visibility
+                        : Icons.visibility_off,
                   ),
+                  onPressed: _toggleRepeatPasswordVisibility,
                 ),
               ),
-              TextField(
-                controller: _repeatPasswordController,
-                obscureText: _obscureRepeatPassword,
-                decoration: InputDecoration(
-                  labelText: "Repeat Password",
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscureRepeatPassword ? Icons.visibility : Icons.visibility_off,
-                    ),
-                    onPressed: _toggleRepeatPasswordVisibility,
-                  ),
-                ),
-              ),
-              Row(
-                children: [
-                  Checkbox(
-                    value: _isChecked,
-                    onChanged: (bool? newValue) {
-                      setState(() {
-                        _isChecked = newValue!;
-                      });
-                    },
-                  ),
-                  Text("Patient"),
-                ],
-              ),
-              if (_isChecked)
-                DropdownButton<String>(
-                  hint: Text("Select a Doctor"),
-                  value: _selectedDoctorId,
-                  onChanged: (String? newValue) {
+            ),
+            Row(
+              children: [
+                Checkbox(
+                  value: _isChecked,
+                  onChanged: (bool? newValue) {
                     setState(() {
-                      _selectedDoctorId = newValue;
+                      _isChecked = newValue!;
+                      // Reset selected doctor
+                      if (!_isChecked) {
+                        _selectedDoctorId = null;
+                        _selectedDoctorFirstName = null;
+                        _selectedDoctorLastName = null;
+                        _selectedDoctorAddress = null;
+                        _selectedDoctorPhoneNumber = null;
+                      }
                     });
                   },
-                  items: _doctors.map<DropdownMenuItem<String>>(
-                      (Map<String, dynamic> doctor) {
-                    return DropdownMenuItem<String>(
-                      value: doctor['id'],
-                      child: Text(doctor['name']),
-                    );
-                  }).toList(),
                 ),
-              SizedBox(height: 20),
-              _isLoading
-                  ? CircularProgressIndicator()
-                  : ElevatedButton(
-                      onPressed: _signUp,
-                      child: Text("Sign Up"),
-                    ),
-            const SizedBox(height: 20),
+                Text("Patient"),
+              ],
+            ),
+
+// Display DropdownButton if true
+            if (_isChecked) ...[
+              DropdownButton<String>(
+                hint: Text("Select a Doctor"),
+                value: _selectedDoctorId,
+                onChanged: (String? newValue) {
+                  setState(() {
+                    _selectedDoctorId = newValue;
+
+                    // Update selected doctor information
+                    var selectedDoctor = _doctors.firstWhere(
+                      (doctor) => doctor['id'] == newValue,
+                      orElse: () => {},
+                    );
+
+                    _selectedDoctorFirstName = selectedDoctor['firstName'];
+                    _selectedDoctorLastName = selectedDoctor['lastName'];
+                    _selectedDoctorAddress = selectedDoctor['address'];
+                    _selectedDoctorPhoneNumber = selectedDoctor['phone'];
+                  });
+                },
+                items: _doctors.map<DropdownMenuItem<String>>(
+                    (Map<String, dynamic> doctor) {
+                  return DropdownMenuItem<String>(
+                    value: doctor['id'],
+                    child: Text(doctor['firstName']),
+                  );
+                }).toList(),
+              ),
+
+              // Display selected doctor information
+              if (_selectedDoctorFirstName != null) ...[
+                SizedBox(height: 10.0),
+                Text(
+                  "Last name : $_selectedDoctorLastName",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "First name : $_selectedDoctorFirstName",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Address : $_selectedDoctorAddress",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  "Phone number : $_selectedDoctorPhoneNumber",
+                  style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ],
+            SizedBox(height: 20.0),
             // Add Privacy Policy link here
             TextButton(
               onPressed: _navigateToPrivacyPolicy,
@@ -355,8 +406,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ),
             ),
-            ],
-          ),
+            _isLoading
+                ? CircularProgressIndicator()
+                : ElevatedButton(
+                    onPressed: _signUp,
+                    child: Text("Sign Up"),
+                  ),
+          ],
         ),
       ),
     );
@@ -366,11 +422,11 @@ class _RegisterPageState extends State<RegisterPage> {
   void dispose() {
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _cityController.dispose();
+    _postalCodeController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
-    _cityController.dispose();
-    _postalCodeController.dispose();
     _countryController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
