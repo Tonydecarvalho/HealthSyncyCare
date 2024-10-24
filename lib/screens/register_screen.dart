@@ -5,7 +5,7 @@ import 'package:healthsyncycare/screens/doctor/home_screen_doctor.dart';
 import 'package:healthsyncycare/screens/login_screen.dart';
 import 'package:healthsyncycare/screens/patient/home_screen.dart';
 import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
-import 'package:intl/intl.dart';  // Import the intl package for DateFormat
+import 'package:intl/intl.dart'; // Import the intl package for DateFormat
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -15,31 +15,25 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _genderController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _dateOfBirthController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
 
   String? _selectedGender;
   DateTime? _selectedDateOfBirth;
-  bool _isChecked = false; // Is user a patient?
-  String? _selectedDoctorId; // Selected doctor id
-  List<Map<String, dynamic>> _doctors = [];
 
   bool _isLoading = false;
   bool _obscurePassword = true;
   bool _obscureRepeatPassword = true;
-  bool _isChecked = false;
+  bool _isChecked = false; // Is user a patient?
 
   String? _selectedDoctorId; // Selected doctor id
   String? _selectedDoctorFirstName;
@@ -52,11 +46,10 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     super.initState();
-    _fetchDoctors();
+    _fetchDoctors(); // Fetch available doctors
   }
 
   Future<void> _fetchDoctors() async {
-    // Fetch available doctors
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
           .collection('users')
@@ -104,25 +97,23 @@ class _RegisterPageState extends State<RegisterPage> {
     });
 
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text,
         password: _passwordController.text,
       );
 
       Map<String, dynamic> userData = {
-        'name': _nameController.text,
-        'gender': _genderController.text,
+        'gender': _selectedGender,
         'firstName': _firstNameController.text,
         'lastName': _lastNameController.text,
-        'dateOfBirth': _dateOfBirthController.text,
+        'dateOfBirth': _selectedDateOfBirth?.toIso8601String(),
         'city': _cityController.text,
         'postalCode': _postalCodeController.text,
         'email': _emailController.text.trim(),
         'phone': _phoneController.text,
         'address': _addressController.text,
         'country': _countryController.text,
-        'phone': _phoneController.text,
         'role': _isChecked ? "patient" : "doctor",
         'createdAt': DateTime.now(),
       };
@@ -141,23 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
       );
 
       // Reset form
-      _nameController.clear();
-      _genderController.clear();
-      _firstNameController.clear();
-      _lastNameController.clear();
-      _dateOfBirthController.clear();
-      _cityController.clear();
-      _postalCodeController.clear();
-      _emailController.clear();
-      _addressController.clear();
-      _countryController.clear();
-      _phoneController.clear();
-      _passwordController.clear();
-      _repeatPasswordController.clear();
-
-      setState(() {
-        _selectedDoctorId = null;
-      });
+      _clearFields();
 
       if (_isChecked) {
         Navigator.of(context).pushReplacement(
@@ -260,13 +235,20 @@ class _RegisterPageState extends State<RegisterPage> {
                 ),
               ],
             ),
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: "Name"),
-            ),
-            TextField(
-              controller: _genderController,
+            DropdownButtonFormField<String>(
               decoration: InputDecoration(labelText: "Gender"),
+              value: _selectedGender,
+              items: ['Male', 'Female', 'Other'].map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
+              onChanged: (String? newValue) {
+                setState(() {
+                  _selectedGender = newValue;
+                });
+              },
             ),
             TextField(
               controller: _firstNameController,
@@ -276,9 +258,15 @@ class _RegisterPageState extends State<RegisterPage> {
               controller: _lastNameController,
               decoration: InputDecoration(labelText: "Last name"),
             ),
-            TextField(
-              controller: _dateOfBirthController,
-              decoration: InputDecoration(labelText: "Date of birth"),
+            TextFormField(
+              readOnly: true,
+              onTap: () => _selectDateOfBirth(context),
+              decoration: InputDecoration(
+                labelText: _selectedDateOfBirth == null
+                    ? 'Date of Birth'
+                    : 'Date of Birth: ${DateFormat.yMd().format(_selectedDateOfBirth!)}',
+                suffixIcon: Icon(Icons.calendar_today),
+              ),
             ),
             TextField(
               controller: _cityController,
@@ -295,16 +283,16 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
             TextField(
               controller: _addressController,
-              decoration: InputDecoration(labelText: "Address"),
+              decoration: InputDecoration(labelText: "Street Address"),
             ),
             TextField(
               controller: _countryController,
               decoration: InputDecoration(labelText: "Country"),
             ),
             TextField(
-              controller: _phoneController,
-              decoration: InputDecoration(labelText: "Phone"),
-            ),
+                controller: _phoneController,
+                decoration: InputDecoration(labelText: "Phone"),
+                keyboardType: TextInputType.phone),
             TextField(
               controller: _passwordController,
               obscureText: _obscurePassword,
@@ -407,6 +395,17 @@ class _RegisterPageState extends State<RegisterPage> {
               ],
             ],
             SizedBox(height: 20.0),
+            // Add Privacy Policy link here
+            TextButton(
+              onPressed: _navigateToPrivacyPolicy,
+              child: Text(
+                "Privacy Policy",
+                style: TextStyle(
+                  color: Colors.blue,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ),
             _isLoading
                 ? CircularProgressIndicator()
                 : ElevatedButton(
@@ -421,18 +420,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   void dispose() {
-    _nameController.dispose();
-    _genderController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
-    _dateOfBirthController.dispose();
     _cityController.dispose();
     _postalCodeController.dispose();
     _emailController.dispose();
     _phoneController.dispose();
     _addressController.dispose();
     _countryController.dispose();
-    _phoneController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
     super.dispose();
