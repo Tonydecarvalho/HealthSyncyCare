@@ -24,6 +24,93 @@ class DoctorProfilePage extends StatelessWidget {
     return doctorSnapshot.data() as Map<String, dynamic>;
   }
 
+  // Function to delete the account and associated data
+  Future<void> _deleteAccount(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    final TextEditingController _confirmationController =
+        TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Account'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text('Are you sure you want to delete your account?'),
+              const SizedBox(height: 10),
+              const Text('Type "delete" to confirm:'),
+              TextField(
+                controller: _confirmationController,
+                decoration: const InputDecoration(
+                  labelText: 'Confirmation',
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop(); // Close the dialog
+              },
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                if (_confirmationController.text.toLowerCase() == 'delete') {
+                  try {
+                    // Delete BookAppointments for the doctor or patient
+                    final uid = user?.uid;
+                    if (uid != null) {
+                      // Delete appointments where doctorId matches
+                      await FirebaseFirestore.instance
+                          .collection('BookAppointments')
+                          .where('doctorId', isEqualTo: uid)
+                          .get()
+                          .then((querySnapshot) {
+                        for (var doc in querySnapshot.docs) {
+                          doc.reference.delete(); // Delete each appointment
+                        }
+                      });
+
+                      // Delete appointments where patientId matches
+                      await FirebaseFirestore.instance
+                          .collection('BookAppointments')
+                          .where('patientId', isEqualTo: uid)
+                          .get()
+                          .then((querySnapshot) {
+                        for (var doc in querySnapshot.docs) {
+                          doc.reference.delete(); // Delete each appointment
+                        }
+                      });
+                    }
+
+                    // Delete the user account from Firebase Auth
+                    await user?.delete();
+
+                    // Log the user out and redirect to login screen
+                    Navigator.of(context).pushReplacementNamed('/login');
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error: $e')),
+                    );
+                  }
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content: Text('Please type "delete" to confirm')),
+                  );
+                }
+              },
+              child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,6 +166,8 @@ class DoctorProfilePage extends StatelessWidget {
               ),
               _buildDoctorInfoCard(doctorData),
               const SizedBox(height: 15.0),
+
+              // Logout button
               ElevatedButton(
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
@@ -87,6 +176,20 @@ class DoctorProfilePage extends StatelessWidget {
                       horizontal: 20.0, vertical: 15.0),
                 ),
                 child: const Text('Logout'),
+              ),
+
+              // Add spacing
+              const SizedBox(height: 10.0),
+
+              // Delete Account button
+              ElevatedButton(
+                onPressed: () => _deleteAccount(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 15.0),
+                ),
+                child: const Text('Delete Account'),
               ),
             ],
           );
