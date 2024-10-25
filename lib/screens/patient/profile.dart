@@ -93,6 +93,17 @@ class ProfilePage extends StatelessWidget {
                           doc.reference.delete(); // Delete each appointment
                         }
                       });
+                      // Delete shared conditions with the doctor
+                      await FirebaseFirestore.instance
+                          .collection('conditions')
+                          .where('patientId', isEqualTo: uid)
+                          .get()
+                          .then((querySnapshot) {
+                        for (var doc in querySnapshot.docs) {
+                          doc.reference
+                              .delete(); // Delete each shared condition
+                        }
+                      });
                     }
 
                     // Delete the user account from Firebase Auth
