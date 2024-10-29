@@ -34,11 +34,17 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
 
   final List categoriesNames = [
     "Patient",
+    "Patient Reports",
     "Appointments",
     "History prescription"
   ];
 
   final List<Icon> categoriesIcons = [
+    const Icon(
+      Icons.person,
+      color: Color(0xFF008000),
+      size: 80
+    ),
     const Icon(
       Icons.medical_services_sharp,
       color: Color(0xFF008000),
@@ -130,14 +136,18 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                           onTap: () {
                             switch (index) {
                               case 0:
-                                Navigator.pushNamed(context, '/patients conditions');
+                                Navigator.pushNamed(context, '/patients list');
                                 print("Open Patient page");
                                 break;
                               case 1:
-                              Navigator.pushNamed(context, '/viewDoctorAppointment');
-                                print("Open Appointments page");
+                              Navigator.pushNamed(context, '/patients conditions');
+                                print("Open Patient page");
                                 break;
                               case 2:
+                               Navigator.pushNamed(context, '/viewDoctorAppointment');
+                                print("Open Appointments page");
+                                break;
+                              case 3:
                                 Navigator.pushNamed(context, '/doctor prescriptions list');
                                 print("Open History prescription page");
                                 break;
