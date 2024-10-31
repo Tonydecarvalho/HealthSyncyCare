@@ -37,6 +37,7 @@ flutter_icons:
 flutter:
   assets:
     - assets/privacy_policy.json
+    - .env
   uses-material-design: true
 
 flutter_launcher_icons:

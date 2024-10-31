@@ -20,11 +20,21 @@ import 'package:healthsyncycare/screens/patient/profile.dart';
 import 'package:healthsyncycare/screens/doctor/profile.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_details.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(MyApp());
+  await Firebase.initializeApp(); // Ensure Firebase is initialized
+  
+  // Load the .env file before running the app
+  try {
+    await dotenv.load(fileName: ".env");
+    print("Environment variables loaded successfully");
+  } catch (e) {
+    print("Error loading .env file: $e");
+  }
+
+  runApp(MyApp()); // Replace with your main app widget
 }
 
 class MyApp extends StatelessWidget {
