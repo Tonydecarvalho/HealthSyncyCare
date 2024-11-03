@@ -17,20 +17,21 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
   }
 
   Future<void> _getUserName() async {
-      final user = FirebaseAuth.instance.currentUser;
-    if(user != null) {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
       final userId = user.uid;
-      final userDoc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
+      final userDoc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userId)
+          .get();
 
-      if(userDoc.exists){
+      if (userDoc.exists) {
         setState(() {
           userName = userDoc.data()?['firstName'];
         });
       }
     }
   }
-
-
 
   final List categoriesNames = [
     "Patient",
@@ -40,26 +41,11 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
   ];
 
   final List<Icon> categoriesIcons = [
-    const Icon(
-      Icons.person,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.medical_services_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.calendar_month_sharp,
-      color: Color(0xFF008000),
-      size: 80
-    ),
-    const Icon(
-      Icons.history,
-      color: Color(0xFF008000),
-      size: 80
-    )
+    const Icon(Icons.person, color: Color(0xFF176139), size: 80),
+    const Icon(Icons.medical_services_sharp,
+        color: Color(0xFF176139), size: 80),
+    const Icon(Icons.calendar_month_sharp, color: Color(0xFF176139), size: 80),
+    const Icon(Icons.history, color: Color(0xFF176139), size: 80)
   ];
 
   @override
@@ -70,7 +56,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
           Container(
             padding: EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
             decoration: const BoxDecoration(
-                color: Color(0xFF008000),
+                color: Color(0xFF176139),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
@@ -81,13 +67,17 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.dashboard, size: 30, color: Color(0xFFFFFFFF)),
+                    Image.asset(
+                      'assets/logo.png',
+                      width: 30,
+                      height: 30,
+                    ),
                     InkWell(
                       onTap: () {
-                         Navigator.pushNamed(
-                                    context, '/doctor profile');
+                        Navigator.pushNamed(context, '/doctor profile');
                       },
-                      child: const Icon(Icons.account_circle_sharp, size: 30, color: Color(0xFFFFFFFF)),
+                      child: const Icon(Icons.account_circle_sharp,
+                          size: 30, color: Color(0xFFFFFFFF)),
                     ),
                   ],
                 ),
@@ -105,7 +95,6 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
               ],
             ),
           ),
-
           Padding(
             padding: EdgeInsets.only(top: 20, left: 15, right: 15),
             child: Column(
@@ -140,15 +129,18 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                                 print("Open Patient page");
                                 break;
                               case 1:
-                              Navigator.pushNamed(context, '/patients conditions');
+                                Navigator.pushNamed(
+                                    context, '/patients conditions');
                                 print("Open Patient page");
                                 break;
                               case 2:
-                               Navigator.pushNamed(context, '/viewDoctorAppointment');
+                                Navigator.pushNamed(
+                                    context, '/viewDoctorAppointment');
                                 print("Open Appointments page");
                                 break;
                               case 3:
-                                Navigator.pushNamed(context, '/doctor prescriptions list');
+                                Navigator.pushNamed(
+                                    context, '/doctor prescriptions list');
                                 print("Open History prescription page");
                                 break;
                               default:
@@ -175,16 +167,14 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                                     child: categoriesIcons[index]),
                                 const SizedBox(height: 10),
                                 FittedBox(
-                                  fit: BoxFit.scaleDown,
-                                  child: Text(
-                                    categoriesNames[index],
-                                    style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.w600,
-                                      color: Color(0xFF000000)
-                                    ),
-                                  )
-                                ),
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      categoriesNames[index],
+                                      style: const TextStyle(
+                                          fontSize: 22,
+                                          fontWeight: FontWeight.w600,
+                                          color: Color(0xFF000000)),
+                                    )),
                               ],
                             ),
                           ));

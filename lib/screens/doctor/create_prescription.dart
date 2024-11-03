@@ -49,19 +49,21 @@ class _CreatePrescriptionPageState extends State<CreatePrescriptionPage> {
     }
   }
 
-  void _addDrugToPrescription() {
-    if (_selectedDrug != null && _formKey.currentState!.validate()) {
-      setState(() {
-        _prescriptionDrugs.add({
-          'drug': _selectedDrug,
-          'quantity': int.parse(_quantityController.text),
-          'notice': _noticeController.text,
-        });
-        _quantityController.clear();
-        _noticeController.clear();
+void _addDrugToPrescription() {
+  if (_selectedDrug != null && _formKey.currentState!.validate()) {
+    setState(() {
+      _prescriptionDrugs.add({
+        'drug': _selectedDrug,
+        'quantity': _quantityController.text, // Keep as a string
+        'notice': _noticeController.text,
       });
-    }
+      _quantityController.clear();
+      _noticeController.clear();
+      _selectedDrug = null;
+    });
   }
+}
+
 
 Future<void> _savePrescription() async {
   if (_doctorId == null) {
@@ -82,10 +84,15 @@ Future<void> _savePrescription() async {
     'createdAt': FieldValue.serverTimestamp(),
   });
 
-  for (var drug in _prescriptionDrugs) {
-    final drugRef = prescriptionRef.collection('drug').doc();
-    batch.set(drugRef, drug);
-  }
+ for (var drug in _prescriptionDrugs) {
+  final drugRef = prescriptionRef.collection('drug').doc();
+  batch.set(drugRef, {
+    'drug': drug['drug'],
+    'quantity': drug['quantity'].toString(), 
+    'notice': drug['notice'],
+  });
+}
+
 
   batch.update(conditionRef, {
     'hasPrescription': true,
@@ -128,8 +135,12 @@ void _showConfirmationDialog() {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Create Prescription'),
-        backgroundColor: Colors.green,
+        title: Text('Create Prescription', style: TextStyle(color: Colors.white)),
+         leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        backgroundColor: const Color(0xFF176139),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -195,8 +206,18 @@ void _showConfirmationDialog() {
               ElevatedButton(
                 onPressed:
                     _prescriptionDrugs.isNotEmpty ? _savePrescription : null,
-                child: Text('Save Prescription'),
+                 style: ElevatedButton.styleFrom(
+                   backgroundColor: Color(0xFF176139),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text('Save Prescription', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
+              const SizedBox(height: 10.0),
+
             ],
           ),
         ),

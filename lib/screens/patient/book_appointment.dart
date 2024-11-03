@@ -275,8 +275,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                 _symptomsController.clear(); // Clear input
               },
               style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green), // Button style
-              child: const Text('Confirm'),
+                  backgroundColor: Color(0xFF78B777)), // Button style
+              child: const Text('Confirm', style: TextStyle(color: Colors.white)),
             ),
           ],
         );
@@ -320,8 +320,8 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
                   margin: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: timeData['isBooked']
-                        ? Colors.redAccent
-                        : Colors.lightGreen,
+                        ? Color(0xFFD9534F)
+                        : Color(0xFF78B777),
                     border: Border.all(
                       color: _selectedTime == timeData['time'] &&
                               !timeData['isBooked']
@@ -382,9 +382,11 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
+          color: Colors.white,
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Appointment'),
+        title: const Text('Appointment', style: TextStyle(color: Colors.white),),
+        backgroundColor: Color(0xFF176139),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

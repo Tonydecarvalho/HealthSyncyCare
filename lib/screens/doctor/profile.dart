@@ -146,13 +146,18 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008000),
-        title: const Text('Doctor Profile'),
+        backgroundColor: const Color(0xFF176139),
+        title: const Text('Doctor Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           if (!_isEditing)
             IconButton(
               icon: const Icon(Icons.edit),
+              color: Colors.white,
               onPressed: () {
                 setState(() {
                   _isEditing = true;
@@ -162,6 +167,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
           if (_isEditing)
             IconButton(
               icon: const Icon(Icons.save),
+              color: Colors.white,
               onPressed: () async {
                 await _updateDoctorData();
                 setState(() {
@@ -203,11 +209,10 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
             children: [
               CircleAvatar(
                 radius: 50.0,
-                backgroundColor: const Color(0xFF008000),
-                child: const Icon(
-                  Icons.account_circle,
-                  size: 70.0,
-                  color: Colors.white,
+                backgroundColor: const Color(0xFF176139),
+                child: Image.asset(
+                  'assets/Healthsyncycare.png',
+                  height: 100,
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -223,26 +228,34 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
               ElevatedButton(
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFF176139),
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Logout'),
+                child: const Text('Logout', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
 
-              // Add spacing
               const SizedBox(height: 10.0),
 
               // Delete Account button
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: () => _deleteAccount(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  foregroundColor: Colors.red,
+                  side: BorderSide(color: Colors.red, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Delete Account'),
+                child: const Text('Delete Account',
+                    style: TextStyle(fontSize: 18, color: Colors.red)),
               ),
+              const SizedBox(height: 20),
             ],
           );
         },

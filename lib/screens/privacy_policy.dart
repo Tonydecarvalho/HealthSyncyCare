@@ -31,7 +31,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor:
-            Color(0xFF008000), // Use the green color for the app bar
+            Color(0xFF176139), // Use the green color for the app bar
         title: Text('Privacy Policy'),
       ),
       body: privacyPolicyData == null
@@ -46,7 +46,7 @@ class _PrivacyPolicyPageState extends State<PrivacyPolicyPage> {
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF008000), // Green accent for heading
+                      color: Color(0xFF176139), // Green accent for heading
                     ),
                   ),
                   SizedBox(height: 10),

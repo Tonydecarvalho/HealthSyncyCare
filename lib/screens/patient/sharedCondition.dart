@@ -90,9 +90,11 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Share Your Symptoms"),
+        title: Text("Share Your Symptoms", style: TextStyle(color: Colors.white)),
+        backgroundColor: const Color(0xFF176139),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
+          color: Colors.white,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -173,12 +175,17 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
             if (_symptoms.isNotEmpty)
               ElevatedButton(
                 onPressed: _saveConditions,
-                child: Text('Submit Symptoms'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  minimumSize: Size.fromHeight(50),
+                   backgroundColor: Color(0xFF176139),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
+              child: const Text('Submit Symptoms', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
+              const SizedBox(height: 10.0),
           ],
         ),
       ),

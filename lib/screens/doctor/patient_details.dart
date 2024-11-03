@@ -11,8 +11,12 @@ class PatientDetailsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Patient Details'),
-        backgroundColor: const Color(0xFF008000),
+        title: const Text('Patient Details', style: TextStyle(color: Colors.white)),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),  
+        backgroundColor: const Color(0xFF176139),
       ),
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance.collection('users').doc(patientId).get(),
@@ -73,7 +77,7 @@ class PatientDetailsPage extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22.0,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF008000),
+                    color: Color(0xFF176139),
                   ),
                 ),
                 _buildSymptomHistoryList(),

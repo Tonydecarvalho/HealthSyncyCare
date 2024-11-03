@@ -32,9 +32,13 @@ class _DoctorPatientListPageState extends State<DoctorPatientListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Patients List'),
+        title: const Text('Patients List', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        backgroundColor: const Color(0xFF176139),
       ),
       body: Column(
         children: [
@@ -61,7 +65,7 @@ class _DoctorPatientListPageState extends State<DoctorPatientListPage> {
                     isNameAscending
                         ? Icons.sort_by_alpha
                         : Icons.sort_by_alpha_outlined,
-                    color: const Color(0xFF008000),
+                    color: const Color(0xFF176139),
                   ),
                   tooltip: isNameAscending ? 'Sort: A-Z' : 'Sort: Z-A',
                 ),
