@@ -10,7 +10,7 @@ class PatientConditionDetailsPatient extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000),
+        backgroundColor: const Color(0xFF176139),
         title: const Text(
           'Condition Details',
           style: TextStyle(

@@ -152,13 +152,18 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008000),
-        title: const Text('Profile'),
+        backgroundColor: const Color(0xFF176139),
+        title: const Text('Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
+         leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         actions: [
           if (!_isEditing)
             IconButton( // Edit button state
               icon: const Icon(Icons.edit),
+              color: Colors.white,
               onPressed: () {
                 setState(() {
                   _isEditing = true;
@@ -168,6 +173,7 @@ class _ProfilePageState extends State<ProfilePage> {
           if (_isEditing)
             IconButton(
               icon: const Icon(Icons.save),
+              color: Colors.white,
               onPressed: () async {
                 await _updateUserData();
                 setState(() {
@@ -208,15 +214,11 @@ class _ProfilePageState extends State<ProfilePage> {
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
-              CircleAvatar(
-                radius: 50.0,
-                backgroundColor: const Color(0xFF008000),
-                child: const Icon(
-                  Icons.account_circle,
-                  size: 70.0,
-                  color: Colors.white,
+             Image.asset(
+                  'assets/Healthsyncycare.png',
+                  height: 100,
                 ),
-              ),
+              
               const SizedBox(height: 20.0),
               Text(
                 FirebaseAuth.instance.currentUser?.email ?? 'User',
@@ -234,26 +236,33 @@ class _ProfilePageState extends State<ProfilePage> {
               ElevatedButton(
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFF176139),
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Logout'),
+                child: const Text('Logout', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
 
               const SizedBox(height: 10.0),
 
               // Delete Account button
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: () => _deleteAccount(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  foregroundColor: Colors.red,
+                  side: BorderSide(color: Colors.red, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Delete Account'),
+                child: const Text('Delete Account',
+                    style: TextStyle(fontSize: 18, color: Colors.red)),
               ),
-
               const SizedBox(height: 20),
 
               // Add the privacy policy link

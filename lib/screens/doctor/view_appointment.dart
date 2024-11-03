@@ -137,8 +137,12 @@ class _ViewDoctorAppointmentPageState extends State<ViewDoctorAppointmentPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Doctor\'s Calendar'),
-        backgroundColor: Colors.green,
+        title: const Text('Doctor\'s Calendar', style: TextStyle(color: Colors.white)),
+        backgroundColor: Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       ),
       body: Column(
         children: [

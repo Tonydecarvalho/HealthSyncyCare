@@ -95,10 +95,10 @@ class _MyHomePageState extends State<MyHomePage> {
   // List of icons corresponding to each category name
   final List<Icon> categoriesIcons = [
     const Icon(Icons.medical_services_sharp,
-        color: Color(0xFF008000), size: 80),
-    const Icon(Icons.calendar_month_sharp, color: Color(0xFF008000), size: 80),
-    const Icon(Icons.history, color: Color(0xFF008000), size: 80),
-    const Icon(Icons.description_sharp, color: Color(0xFF008000), size: 80),
+        color: Color(0xFF176139), size: 80),
+    const Icon(Icons.calendar_month_sharp, color: Color(0xFF176139), size: 80),
+    const Icon(Icons.history, color: Color(0xFF176139), size: 80),
+    const Icon(Icons.description_sharp, color: Color(0xFF176139), size: 80),
   ];
 
   @override
@@ -110,7 +110,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Container(
             padding: EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
             decoration: const BoxDecoration(
-                color: Color(0xFF008000),
+                color: Color(0xFF176139),
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(20),
                   bottomRight: Radius.circular(20),
@@ -121,8 +121,11 @@ class _MyHomePageState extends State<MyHomePage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Icon(Icons.dashboard,
-                        size: 30, color: Color(0xFFFFFFFF)), // Dashboard icon
+                    Image.asset(
+                      'assets/logo.png',
+                      width: 30,
+                      height: 30,
+                    ),
                     InkWell(
                       onTap: () {
                         Navigator.pushNamed(context, '/profile'); // Navigate to profile page
@@ -267,7 +270,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       Icon(
                         Icons.calendar_today,
-                        color: Color(0xFF008000),
+                        color: Color(0xFF176139),
                         size: 40, // Calendar icon
                       ),
                       const SizedBox(width: 15),

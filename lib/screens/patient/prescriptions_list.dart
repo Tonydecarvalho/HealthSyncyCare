@@ -34,7 +34,7 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000),
+        backgroundColor: const Color(0xFF176139),
         title: const Text(
           'My Prescriptions',
           style: TextStyle(
@@ -68,7 +68,7 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
                   onPressed: _toggleDateSortOrder,
                   icon: Icon(
                     isDateDescending ? Icons.arrow_downward : Icons.arrow_upward,
-                    color: Color(0xFF008000),
+                    color: Color(0xFF176139),
                   ),
                   tooltip: isDateDescending ? 'Sort: Newest First' : 'Sort: Oldest First',
                 ),
@@ -141,7 +141,7 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
                                         return Text("${drug['drug']} - Quantity: ${drug['quantity']}");
                                       }).toList(),
                                     ),
-                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF008000)),
+                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF176139)),
                                     onTap: () {
                                       Navigator.pushNamed(
                                         context,

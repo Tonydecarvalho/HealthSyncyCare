@@ -17,7 +17,7 @@ class PatientConditionDetails extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000),
+        backgroundColor: const Color(0xFF176139),
         title: const Text(
           'Patient Condition Details',
           style: TextStyle(
@@ -60,7 +60,7 @@ class PatientConditionDetails extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 28.0,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF008000),
+                          color: Color(0xFF176139),
                         ),
                       ),
                       SizedBox(height: 8.0),
@@ -123,7 +123,7 @@ class PatientConditionDetails extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 22.0,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF008000),
+                    color: Color(0xFF176139),
                   ),
                 ),
                 SizedBox(height: 16.0),
@@ -167,7 +167,7 @@ class PatientConditionDetails extends StatelessWidget {
                         },
                       );
                     },
-                    backgroundColor: const Color(0xFF008000),
+                    backgroundColor: const Color(0xFF176139),
                     icon: const Icon(
                       Icons.local_pharmacy,
                       size: 30.0,
@@ -201,7 +201,7 @@ class PatientConditionDetails extends StatelessWidget {
           children: [
             Icon(
               Icons.local_hospital,
-              color: Color(0xFF008000),
+              color: Color(0xFF176139),
               size: 40.0,
             ),
             SizedBox(width: 16.0),

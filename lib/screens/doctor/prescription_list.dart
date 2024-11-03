@@ -82,7 +82,11 @@ class _DoctorPrescriptionsHistoryPageState
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000),
+        backgroundColor: const Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'Patients & Prescriptions',
           style: TextStyle(
@@ -116,7 +120,7 @@ class _DoctorPrescriptionsHistoryPageState
                   onPressed: _toggleNameSortOrder,
                   icon: Icon(
                     isNameAscending ? Icons.sort_by_alpha : Icons.sort_by_alpha_outlined,
-                    color: Color(0xFF008000),
+                    color: Color(0xFF176139),
                   ),
                   tooltip: isNameAscending ? 'Sort: A-Z' : 'Sort: Z-A',
                 ),
@@ -125,7 +129,7 @@ class _DoctorPrescriptionsHistoryPageState
                   onPressed: _toggleDateSortOrder,
                   icon: Icon(
                     isDateDescending ? Icons.arrow_downward : Icons.arrow_upward,
-                    color: Color(0xFF008000),
+                    color: Color(0xFF176139),
                   ),
                   tooltip: isDateDescending ? 'Sort: Newest First' : 'Sort: Oldest First',
                 ),
