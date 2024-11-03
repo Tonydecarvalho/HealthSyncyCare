@@ -35,6 +35,10 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'My Prescriptions',
           style: TextStyle(
@@ -93,7 +97,17 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
                         );
                       }
 
-                      var prescriptions = snapshot.data!.docs;
+                      // Copy prescriptions to a local list and sort them by date locally
+                      List<DocumentSnapshot> prescriptions = snapshot.data!.docs;
+
+                      // Sort prescriptions by 'createdAt' locally
+                      prescriptions.sort((a, b) {
+                        Timestamp aTimestamp = a['createdAt'];
+                        Timestamp bTimestamp = b['createdAt'];
+                        return isDateDescending
+                            ? bTimestamp.compareTo(aTimestamp)
+                            : aTimestamp.compareTo(bTimestamp);
+                      });
 
                       return ListView.builder(
                         itemCount: prescriptions.length,

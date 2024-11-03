@@ -175,12 +175,17 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
             if (_symptoms.isNotEmpty)
               ElevatedButton(
                 onPressed: _saveConditions,
-                child: Text('Submit Symptoms', style: TextStyle(color: Colors.white)),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF176139),
-                  minimumSize: Size.fromHeight(50),
+                   backgroundColor: Color(0xFF176139),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
+              child: const Text('Submit Symptoms', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
+              const SizedBox(height: 10.0),
           ],
         ),
       ),

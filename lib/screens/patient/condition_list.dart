@@ -42,6 +42,10 @@ class _PatientsConditionsPatientState extends State<PatientsConditionsPatient> {
         // Header of the page
         centerTitle: true,
         backgroundColor: const Color(0xFF176139), // Green color for the app bar
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'Your Conditions',
           style: TextStyle(

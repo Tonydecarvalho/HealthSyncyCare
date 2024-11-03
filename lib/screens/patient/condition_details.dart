@@ -11,6 +11,10 @@ class PatientConditionDetailsPatient extends StatelessWidget {
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'Condition Details',
           style: TextStyle(
@@ -35,7 +39,7 @@ class PatientConditionDetailsPatient extends StatelessWidget {
           
           final conditionData = conditionSnapshot.data!;
           final Timestamp timestamp = conditionData['timestamp'];
-          final String formattedDate = DateFormat('yyyy.MM.dd - kk:mm').format(timestamp.toDate());
+          final String formattedDate = DateFormat('dd.MM.yyyy - kk:mm').format(timestamp.toDate());
 
           return Padding(
             padding: const EdgeInsets.all(16.0),

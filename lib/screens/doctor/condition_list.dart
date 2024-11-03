@@ -79,10 +79,14 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
                 );
               }
 
+              // Trie les résultats localement par timestamp en ordre décroissant
+              List<QueryDocumentSnapshot> sortedConditions = conditionSnapshot.data!.docs;
+              sortedConditions.sort((a, b) => (b['timestamp'] as Timestamp).compareTo(a['timestamp'] as Timestamp));
+
               return ListView.builder(
-                itemCount: conditionSnapshot.data!.docs.length,
+                itemCount: sortedConditions.length,
                 itemBuilder: (context, index) {
-                  final DocumentSnapshot conditionDoc = conditionSnapshot.data!.docs[index];
+                  final DocumentSnapshot conditionDoc = sortedConditions[index];
                   final String patientId = conditionDoc['patientId'];
 
                   return FutureBuilder<DocumentSnapshot>(
