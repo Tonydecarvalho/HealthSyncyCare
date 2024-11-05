@@ -3,25 +3,24 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:healthsyncycare/screens/doctor/patient_details.dart';
 
-
 class DoctorPatientListPage extends StatefulWidget {
   @override
   _DoctorPatientListPageState createState() => _DoctorPatientListPageState();
 }
 
 class _DoctorPatientListPageState extends State<DoctorPatientListPage> {
-  final String? doctorId = FirebaseAuth.instance.currentUser?.uid;
-  String searchQuery = ''; 
-  bool isNameAscending = true; 
+  final String? doctorId = FirebaseAuth.instance.currentUser?.uid; // Retrieves the current doctor's user ID.
+  String searchQuery = ''; // Stores the current search query.
+  bool isNameAscending = true; // Tracks the order for sorting names.
 
-  // Function to handle search input change
+  // Updates search query state when the search input changes.
   void _onSearchChanged(String query) {
     setState(() {
       searchQuery = query.toLowerCase();
     });
   }
 
-  // Toggle sorting order for patient names
+  // Toggles the boolean state to control the sorting order of patient names.
   void _toggleNameSortOrder() {
     setState(() {
       isNameAscending = !isNameAscending;
@@ -34,18 +33,17 @@ class _DoctorPatientListPageState extends State<DoctorPatientListPage> {
       appBar: AppBar(
         title: const Text('Patients List', style: TextStyle(color: Colors.white)),
         centerTitle: true,
-        leading: IconButton( // Back button
+        leading: IconButton( // Provides a back button to return to the previous screen.
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        backgroundColor: const Color(0xFF176139),
+        backgroundColor: const Color(0xFF176139), // Sets the background color of the AppBar.
       ),
       body: Column(
         children: [
-          // Search bar with sorting button
+          // Search bar and sorting button
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10.0),
             child: Row(
               children: [
                 Expanded(
@@ -55,68 +53,57 @@ class _DoctorPatientListPageState extends State<DoctorPatientListPage> {
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
-                    onChanged: _onSearchChanged,
+                    onChanged: _onSearchChanged, // Calls the search change handler on text change.
                   ),
                 ),
                 const SizedBox(width: 10),
                 IconButton(
-                  onPressed: _toggleNameSortOrder,
+                  onPressed: _toggleNameSortOrder, // Toggles name sorting order.
                   icon: Icon(
-                    isNameAscending
-                        ? Icons.sort_by_alpha
-                        : Icons.sort_by_alpha_outlined,
+                    isNameAscending ? Icons.sort_by_alpha : Icons.sort_by_alpha_outlined,
                     color: const Color(0xFF176139),
                   ),
-                  tooltip: isNameAscending ? 'Sort: A-Z' : 'Sort: Z-A',
+                  tooltip: isNameAscending ? 'Sort: A-Z' : 'Sort: Z-A', // Displays tooltip based on sort order.
                 ),
               ],
             ),
           ),
           Expanded(
             child: doctorId == null
-                ? const Center(child: Text('Error: User not logged in.'))
+                ? const Center(child: Text('Error: User not logged in.')) // Error handling if no doctor is logged in.
                 : StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
                         .where('doctorId', isEqualTo: doctorId)
-                        .snapshots(),
+                        .snapshots(), // Stream of patients associated with the doctor.
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator()); // Shows a loading indicator while data is loading.
                       }
-                      if (snapshot.hasError ||
-                          !snapshot.hasData ||
-                          snapshot.data!.docs.isEmpty) {
-                        return const Center(child: Text('No patients found.'));
+                      if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return const Center(child: Text('No patients found.')); // Handles no data or errors.
                       }
 
                       var patients = snapshot.data!.docs;
 
-                      // Filter patients by search query
+                      // Filters patients by the search query.
                       patients = patients.where((patient) {
-                        final fullName =
-                            "${patient['lastName']} ${patient['firstName']}"
-                                .toLowerCase();
+                        final fullName = "${patient['lastName']} ${patient['firstName']}".toLowerCase();
                         return fullName.contains(searchQuery);
                       }).toList();
 
-                      // Sort patients by name
+                      // Sorts patients by name based on the current sort order.
                       patients.sort((a, b) {
-                        final nameA =
-                            "${a['lastName']} ${a['firstName']}".toLowerCase();
-                        final nameB =
-                            "${b['lastName']} ${b['firstName']}".toLowerCase();
-                        return isNameAscending
-                            ? nameA.compareTo(nameB)
-                            : nameB.compareTo(nameA);
+                        final nameA = "${a['lastName']} ${a['firstName']}".toLowerCase();
+                        final nameB = "${b['lastName']} ${b['firstName']}".toLowerCase();
+                        return isNameAscending ? nameA.compareTo(nameB) : nameB.compareTo(nameA);
                       });
 
                       return ListView.builder(
                         itemCount: patients.length,
                         itemBuilder: (context, index) {
                           final patient = patients[index];
-                          final String fullName =
-                              "${patient['lastName']} ${patient['firstName']}";
+                          final String fullName = "${patient['lastName']} ${patient['firstName']}";
                           final String patientId = patient.id;
 
                           return ListTile(
@@ -129,7 +116,7 @@ class _DoctorPatientListPageState extends State<DoctorPatientListPage> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => PatientDetailsPage(
-                                      patientId: patientId),
+                                      patientId: patientId), // Navigates to the patient details page on tap.
                                 ),
                               );
                             },

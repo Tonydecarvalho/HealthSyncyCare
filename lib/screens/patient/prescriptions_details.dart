@@ -26,11 +26,13 @@ class PrescriptionDetailsPage extends StatelessWidget {
           ),
         ),
       ),
+      // Fetch prescription details from Firestore
       body: FutureBuilder<DocumentSnapshot>(
         future: FirebaseFirestore.instance
             .collection('prescriptions')
             .doc(prescriptionId)
             .get(),
+        // Display prescription details
         builder: (context, prescriptionSnapshot) {
           if (prescriptionSnapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -40,11 +42,12 @@ class PrescriptionDetailsPage extends StatelessWidget {
                 child: Text('Failed to load prescription details.'));
           }
 
+          // Extract prescription data
           final prescriptionData = prescriptionSnapshot.data!;
           final Timestamp timestamp = prescriptionData['createdAt'];
           final String formattedDate =
               DateFormat('dd.MM.yyyy').format(timestamp.toDate()); // Date format updated
-
+          // Display prescription details
           return Padding(
             padding: const EdgeInsets.all(20.0),
             child: Column(
@@ -89,6 +92,7 @@ class PrescriptionDetailsPage extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 10.0),
+                // Display drugs list from Firestore collection 'drug' under the prescription document ID
                 Expanded(
                   child: StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
@@ -104,12 +108,13 @@ class PrescriptionDetailsPage extends StatelessWidget {
                       if (drugSnapshot.hasError || !drugSnapshot.hasData) {
                         return const Text('No drugs found.');
                       }
-
+                      // Display drugs list 
                       final drugs = drugSnapshot.data!.docs;
                       return ListView.builder(
                         itemCount: drugs.length,
                         itemBuilder: (context, index) {
                           final drug = drugs[index];
+                          // Display drug details
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Row(

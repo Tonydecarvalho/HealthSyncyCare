@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class PatientDetailsPage extends StatelessWidget {
-  final String patientId;
+  final String patientId; // This holds the patient's ID for querying Firestore.
 
   const PatientDetailsPage({Key? key, required this.patientId}) : super(key: key);
 
@@ -12,7 +12,7 @@ class PatientDetailsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Patient Details', style: TextStyle(color: Colors.white)),
-        leading: IconButton( // Back button
+        leading: IconButton( // Defines a back button to return to the previous screen.
           icon: Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => Navigator.of(context).pop(),
         ),  
@@ -22,18 +22,19 @@ class PatientDetailsPage extends StatelessWidget {
         future: FirebaseFirestore.instance.collection('users').doc(patientId).get(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator()); // Shows a loading spinner while data is being fetched.
           }
           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('Patient not found.'));
+            return const Center(child: Text('Patient not found.')); // Error handling for no data found.
           }
 
-          final data = snapshot.data!.data() as Map<String, dynamic>;
+          final data = snapshot.data!.data() as Map<String, dynamic>; // Extracts patient data from the snapshot.
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Each ListTile displays a different attribute of the patient.
                 ListTile(
                   title: const Text('Full Name'),
                   subtitle: Text("${data['lastName']} ${data['firstName']}"),
@@ -80,7 +81,7 @@ class PatientDetailsPage extends StatelessWidget {
                     color: Color(0xFF176139),
                   ),
                 ),
-                _buildSymptomHistoryList(),
+                _buildSymptomHistoryList(), // Calls a method to build the symptom history list.
               ],
             ),
           );
@@ -95,7 +96,7 @@ class PatientDetailsPage extends StatelessWidget {
           .collection('conditions')
           .where('patientId', isEqualTo: patientId)
           .orderBy('timestamp', descending: true)
-          .snapshots(),
+          .snapshots(), // Fetches condition data for the patient, sorted by timestamp.
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -130,7 +131,7 @@ class PatientDetailsPage extends StatelessWidget {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                subtitle: _buildSymptomList(condition.reference),
+                subtitle: _buildSymptomList(condition.reference), // Builds a list of symptoms for each condition.
               ),
             );
           },

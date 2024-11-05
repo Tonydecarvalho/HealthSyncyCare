@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
 class DoctorProfilePage extends StatefulWidget {
+  // Constructor for the DoctorProfilePage
   const DoctorProfilePage({Key? key}) : super(key: key);
 
   @override
@@ -18,14 +19,18 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
+  // Metho to logout the user
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
+  // Method to get the doctor data
   Future<Map<String, dynamic>> _getDoctorData() async {
     String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
+
+    // Fetch the doctor data from Firestore
     DocumentSnapshot doctorSnapshot =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
@@ -44,9 +49,11 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     return data;
   }
 
+  // Method to update the doctor data
   Future<void> _updateDoctorData() async {
     String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
+    // Update the doctor data in Firestore
     await FirebaseFirestore.instance.collection('users').doc(uid).update({
       'address': _addressController.text,
       'city': _cityController.text,
@@ -142,6 +149,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     );
   }
 
+  // Build the Doctor Profile Page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -263,6 +271,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     );
   }
 
+  // Build the Doctor Info Card
   Widget _buildDoctorInfoCard(Map<String, dynamic> doctorData) {
     // Format date of birth
     String formattedDateOfBirth = ' - ';
@@ -310,6 +319,7 @@ class _DoctorProfilePageState extends State<DoctorProfilePage> {
     );
   }
 
+  // Build the Editable Field
   Widget _buildEditableField(String label, TextEditingController controller) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

@@ -16,9 +16,11 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
 
+  // Firebase instances for authentication and Firestore
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Function to login the user
   Future<void> _login() async {
     setState(() {
       _isLoading = true;
@@ -61,16 +63,19 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  // Function to navigate to the register page
   void _navigateToRegister() {
     Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (context) => RegisterPage()));
   }
 
+  // Function to navigate to the privacy policy page
   void _navigateToPrivacyPolicy() {
     Navigator.of(context).push(MaterialPageRoute(
         builder: (context) => PrivacyPolicyPage())); // Navigates to the Privacy Policy page
   }
 
+  // Build the login screen
   @override
   Widget build(BuildContext context) {
     return Scaffold(

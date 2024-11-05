@@ -5,15 +5,16 @@ import 'package:intl/intl.dart';
 class PatientConditionDetailsPatient extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Retrieve the condition ID passed from the previous page to query Firestore.
     final String conditionId = ModalRoute.of(context)!.settings.arguments as String;
 
     return Scaffold(
       appBar: AppBar(
-        centerTitle: true,
-        backgroundColor: const Color(0xFF176139),
-        leading: IconButton( // Back button
+        centerTitle: true, // Centers the title within the app bar.
+        backgroundColor: const Color(0xFF176139), // Sets the background color of the AppBar.
+        leading: IconButton( // Defines a back button for navigation.
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(), // Pops the current route off the navigation stack.
         ),
         title: const Text(
           'Condition Details',
@@ -28,18 +29,18 @@ class PatientConditionDetailsPatient extends StatelessWidget {
         future: FirebaseFirestore.instance
             .collection('conditions')
             .doc(conditionId)
-            .get(),
+            .get(), // Fetches the condition details from Firestore using the condition ID.
         builder: (context, conditionSnapshot) {
           if (conditionSnapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator()); // Displays a loading spinner while data is fetched.
           }
           if (conditionSnapshot.hasError || !conditionSnapshot.hasData) {
-            return const Center(child: Text('Failed to load condition details.'));
+            return const Center(child: Text('Failed to load condition details.')); // Shows an error if data fails to load.
           }
           
-          final conditionData = conditionSnapshot.data!;
-          final Timestamp timestamp = conditionData['timestamp'];
-          final String formattedDate = DateFormat('dd.MM.yyyy - kk:mm').format(timestamp.toDate());
+          final conditionData = conditionSnapshot.data!; // Accesses the data retrieved from Firestore.
+          final Timestamp timestamp = conditionData['timestamp']; // Retrieves the timestamp of the condition.
+          final String formattedDate = DateFormat('dd.MM.yyyy - kk:mm').format(timestamp.toDate()); // Formats the timestamp into a readable date.
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -70,20 +71,20 @@ class PatientConditionDetailsPatient extends StatelessWidget {
                         .collection('conditions')
                         .doc(conditionId)
                         .collection('symptoms')
-                        .snapshots(),
+                        .snapshots(), // Streams symptom data related to the condition.
                     builder: (context, symptomSnapshot) {
                       if (symptomSnapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator()); // Displays a spinner while symptom data is loading.
                       }
                       if (symptomSnapshot.hasError || !symptomSnapshot.hasData) {
-                        return const Text('No symptoms found.');
+                        return const Text('No symptoms found.'); // Shows a message if no symptoms are found.
                       }
 
-                      final symptoms = symptomSnapshot.data!.docs;
+                      final symptoms = symptomSnapshot.data!.docs; // Accesses the list of symptoms.
                       return ListView.builder(
                         itemCount: symptoms.length,
                         itemBuilder: (context, index) {
-                          final symptom = symptoms[index];
+                          final symptom = symptoms[index]; // Retrieves individual symptom data.
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
                             child: Card(
@@ -97,7 +98,7 @@ class PatientConditionDetailsPatient extends StatelessWidget {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      symptom['description'],
+                                      symptom['description'], // Displays the description of the symptom.
                                       style: TextStyle(
                                         fontSize: 18.0,
                                         fontWeight: FontWeight.bold,
@@ -106,7 +107,7 @@ class PatientConditionDetailsPatient extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 5.0),
                                     Text(
-                                      "Duration: ${symptom['duration']} days",
+                                      "Duration: ${symptom['duration']} days", // Displays the duration of the symptom.
                                       style: TextStyle(
                                         fontSize: 16.0,
                                         color: Colors.grey[700],

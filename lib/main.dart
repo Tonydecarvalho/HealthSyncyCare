@@ -12,7 +12,6 @@ import 'package:healthsyncycare/screens/patient/sharedCondition.dart';
 import 'package:healthsyncycare/screens/doctor/create_prescription.dart';
 import 'package:healthsyncycare/screens/patient/condition_list.dart';
 import 'package:healthsyncycare/screens/patient/condition_details.dart';
-import 'package:healthsyncycare/screens/register_screen.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_details.dart';
 import 'package:healthsyncycare/screens/patient/prescriptions_list.dart';
 import 'package:healthsyncycare/screens/doctor/prescription_list.dart';
@@ -53,8 +52,9 @@ class MyApp extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         ),
         initialRoute: '/login', // Initial route set to login page
+        // Add the routes for the different pages here 
         routes: {
-          '/login': (context) => LoginPage(), // Add the login page route here
+          '/login': (context) => LoginPage(), 
           '/home': (context) => MyHomePage(),
           '/bookAppointment': (context) => BookAppointmentPage(),
           '/viewPatientAppointment': (context) => ViewPatientAppointmentPage(),
@@ -75,6 +75,7 @@ class MyApp extends StatelessWidget {
           '/patient details': (context) => PatientDetailsPage(patientId: ''),
           
         },
+        // Add the onGenerateRoute property to handle named routes with arguments
         onGenerateRoute: (settings) {
           if (settings.name == '/create prescription') {
             final args = settings.arguments as Map<String, String>;
@@ -94,7 +95,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// Définition de MyAppState pour la gestion d'état
+// Create a class to hold the state of the app
 class MyAppState extends ChangeNotifier {
-  // Ajoutez les propriétés et méthodes nécessaires ici
 }
