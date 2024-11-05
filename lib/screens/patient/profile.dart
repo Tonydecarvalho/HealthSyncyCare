@@ -1,11 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:healthsyncycare/screens/privacy_policy.dart'; // Import the Privacy Policy screen
+import 'package:healthsyncycare/screens/privacy_policy.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // Import intl for date formatting
+import 'package:intl/intl.dart';
 
-class ProfilePage extends StatelessWidget {
+class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
+
+  @override
+  _ProfilePageState createState() => _ProfilePageState();
+}
+
+class _ProfilePageState extends State<ProfilePage> {
+  // Variables for edition
+  bool _isEditing = false;
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _postalCodeController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -36,13 +48,30 @@ class ProfilePage extends StatelessWidget {
       }
     }
 
+    // Set initial values for controllers
+    _addressController.text = userData['address'] ?? '';
+    _cityController.text = userData['city'] ?? '';
+    _postalCodeController.text = userData['postalCode'] ?? '';
+    _phoneController.text = userData['phone'] ?? '';
+
     return userData;
+  }
+
+  Future<void> _updateUserData() async {
+    String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'address': _addressController.text,
+      'city': _cityController.text,
+      'postalCode': _postalCodeController.text,
+      'phone': _phoneController.text,
+    });
   }
 
   void _navigateToPrivacyPolicy(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
-    ); // Navigates to the Privacy Policy page
+    );
   }
 
   Future<void> _deleteAccount(BuildContext context) async {
@@ -83,7 +112,6 @@ class ProfilePage extends StatelessWidget {
                     // Delete BookAppointments for the user
                     final uid = user?.uid;
                     if (uid != null) {
-                      // Delete appointments where patientId matches
                       await FirebaseFirestore.instance
                           .collection('BookAppointments')
                           .where('patientId', isEqualTo: uid)
@@ -124,9 +152,36 @@ class ProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008000),
-        title: const Text('Profile'),
+        backgroundColor: const Color(0xFF176139),
+        title: const Text('Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
+         leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          if (!_isEditing)
+            IconButton( // Edit button state
+              icon: const Icon(Icons.edit),
+              color: Colors.white,
+              onPressed: () {
+                setState(() {
+                  _isEditing = true;
+                });
+              },
+            ),
+          if (_isEditing)
+            IconButton(
+              icon: const Icon(Icons.save),
+              color: Colors.white,
+              onPressed: () async {
+                await _updateUserData();
+                setState(() {
+                  _isEditing = false;
+                });
+              },
+            ),
+        ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _getUserAndDoctorData(),
@@ -159,15 +214,11 @@ class ProfilePage extends StatelessWidget {
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
-              CircleAvatar(
-                radius: 50.0,
-                backgroundColor: const Color(0xFF008000),
-                child: const Icon(
-                  Icons.account_circle,
-                  size: 70.0,
-                  color: Colors.white,
+             Image.asset(
+                  'assets/Healthsyncycare.png',
+                  height: 100,
                 ),
-              ),
+              
               const SizedBox(height: 20.0),
               Text(
                 FirebaseAuth.instance.currentUser?.email ?? 'User',
@@ -185,26 +236,33 @@ class ProfilePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFF176139),
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Logout'),
+                child: const Text('Logout', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
 
               const SizedBox(height: 10.0),
 
               // Delete Account button
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: () => _deleteAccount(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  foregroundColor: Colors.red,
+                  side: BorderSide(color: Colors.red, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Delete Account'),
+                child: const Text('Delete Account',
+                    style: TextStyle(fontSize: 18, color: Colors.red)),
               ),
-
               const SizedBox(height: 20),
 
               // Add the privacy policy link
@@ -213,8 +271,8 @@ class ProfilePage extends StatelessWidget {
                 child: Text(
                   "Privacy Policy",
                   style: TextStyle(
-                    color: Colors.blue, // Set the color of the link
-                    decoration: TextDecoration.underline, // Underline the link
+                    color: Colors.blue,
+                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),
@@ -244,32 +302,60 @@ class ProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Gender : ${userData['gender'] ?? ' - '}',
+            Text('Gender: ${userData['gender'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('First Name : ${userData['firstName'] ?? ' - '}',
+            Text('First Name: ${userData['firstName'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Last Name : ${userData['lastName'] ?? ' - '}',
+            Text('Last Name: ${userData['lastName'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Date of Birth : $formattedDateOfBirth',
+            Text('Date of Birth: $formattedDateOfBirth',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Address : ${userData['address'] ?? ' - '}',
+            Text('Country: ${userData['country'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('City : ${userData['city'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
+            _isEditing
+                ? TextField(
+                    controller: _addressController,
+                    decoration: const InputDecoration(
+                      labelText: 'Address',
+                    ),
+                  )
+                : Text('Address: ${userData['address'] ?? ' - '}',
+                    style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Postal Code : ${userData['postalCode'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
+            _isEditing
+                ? TextField(
+                    controller: _cityController,
+                    decoration: const InputDecoration(
+                      labelText: 'City',
+                    ),
+                  )
+                : Text('City: ${userData['city'] ?? ' - '}',
+                    style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Country : ${userData['country'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
+            _isEditing
+                ? TextField(
+                    controller: _postalCodeController,
+                    decoration: const InputDecoration(
+                      labelText: 'Postal Code',
+                    ),
+                  )
+                : Text('Postal Code: ${userData['postalCode'] ?? ' - '}',
+                    style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Phone : ${userData['phone'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
+            _isEditing
+                ? TextField(
+                    controller: _phoneController,
+                    decoration: const InputDecoration(
+                      labelText: 'Phone',
+                    ),
+                  )
+                : Text('Phone: ${userData['phone'] ?? ' - '}',
+                    style: const TextStyle(fontSize: 16.0)),
           ],
         ),
       ),
@@ -280,6 +366,7 @@ class ProfilePage extends StatelessWidget {
     final String fullName =
         '${doctorData['firstName'] ?? ' - '} ${doctorData['lastName'] ?? ' - '}';
 
+    // Doctor information
     return Card(
       elevation: 4.0,
       child: Padding(
@@ -290,15 +377,15 @@ class ProfilePage extends StatelessWidget {
             const Text('My doctor',
                 style: TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold)),
             const SizedBox(height: 10.0),
-            Text('Name : $fullName', style: const TextStyle(fontSize: 16.0)),
+            Text('Name: $fullName', style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Phone : ${doctorData['phone'] ?? ' - '}',
+            Text('Phone: ${doctorData['phone'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Email : ${doctorData['email'] ?? ' - '}',
+            Text('Email: ${doctorData['email'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Address : ${doctorData['address'] ?? ' - '}',
+            Text('Address: ${doctorData['address'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
           ],
         ),

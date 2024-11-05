@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart'; // Import for date formatting
+import 'package:intl/intl.dart';
 
-class DoctorProfilePage extends StatelessWidget {
+class DoctorProfilePage extends StatefulWidget {
   const DoctorProfilePage({Key? key}) : super(key: key);
+
+  @override
+  _DoctorProfilePageState createState() => _DoctorProfilePageState();
+}
+
+class _DoctorProfilePageState extends State<DoctorProfilePage> {
+  // Variables for edition
+  bool _isEditing = false;
+  final TextEditingController _addressController = TextEditingController();
+  final TextEditingController _cityController = TextEditingController();
+  final TextEditingController _postalCodeController = TextEditingController();
+  final TextEditingController _phoneController = TextEditingController();
 
   Future<void> _logout(BuildContext context) async {
     await FirebaseAuth.instance.signOut();
@@ -21,7 +33,26 @@ class DoctorProfilePage extends StatelessWidget {
       throw Exception("Doctor does not exist!");
     }
 
-    return doctorSnapshot.data() as Map<String, dynamic>;
+    var data = doctorSnapshot.data() as Map<String, dynamic>;
+
+    // Set initial values for controllers
+    _addressController.text = data['address'] ?? '';
+    _cityController.text = data['city'] ?? '';
+    _postalCodeController.text = data['postalCode'] ?? '';
+    _phoneController.text = data['phone'] ?? '';
+
+    return data;
+  }
+
+  Future<void> _updateDoctorData() async {
+    String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
+
+    await FirebaseFirestore.instance.collection('users').doc(uid).update({
+      'address': _addressController.text,
+      'city': _cityController.text,
+      'postalCode': _postalCodeController.text,
+      'phone': _phoneController.text,
+    });
   }
 
   // Function to delete the account and associated data
@@ -115,9 +146,36 @@ class DoctorProfilePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color(0xFF008000),
-        title: const Text('Doctor Profile'),
+        backgroundColor: const Color(0xFF176139),
+        title: const Text('Doctor Profile', style: TextStyle(color: Colors.white)),
         centerTitle: true,
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        actions: [
+          if (!_isEditing)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              color: Colors.white,
+              onPressed: () {
+                setState(() {
+                  _isEditing = true;
+                });
+              },
+            ),
+          if (_isEditing)
+            IconButton(
+              icon: const Icon(Icons.save),
+              color: Colors.white,
+              onPressed: () async {
+                await _updateDoctorData();
+                setState(() {
+                  _isEditing = false;
+                });
+              },
+            ),
+        ],
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _getDoctorData(),
@@ -151,11 +209,10 @@ class DoctorProfilePage extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 50.0,
-                backgroundColor: const Color(0xFF008000),
-                child: const Icon(
-                  Icons.account_circle,
-                  size: 70.0,
-                  color: Colors.white,
+                backgroundColor: const Color(0xFF176139),
+                child: Image.asset(
+                  'assets/Healthsyncycare.png',
+                  height: 100,
                 ),
               ),
               const SizedBox(height: 20.0),
@@ -171,26 +228,34 @@ class DoctorProfilePage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => _logout(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                  backgroundColor: Color(0xFF176139),
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Logout'),
+                child: const Text('Logout', style: TextStyle(fontSize: 18, color: Colors.white)),
               ),
 
-              // Add spacing
               const SizedBox(height: 10.0),
 
               // Delete Account button
-              ElevatedButton(
+              OutlinedButton(
                 onPressed: () => _deleteAccount(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
+                style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 15.0),
+                  foregroundColor: Colors.red,
+                  side: BorderSide(color: Colors.red, width: 2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                child: const Text('Delete Account'),
+                child: const Text('Delete Account',
+                    style: TextStyle(fontSize: 18, color: Colors.red)),
               ),
+              const SizedBox(height: 20),
             ],
           );
         },
@@ -217,35 +282,51 @@ class DoctorProfilePage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Gender : ${doctorData['gender'] ?? ' - '}',
+            // Read only fields
+            Text('Gender: ${doctorData['gender'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('First Name : ${doctorData['firstName'] ?? ' - '}',
+            Text('First Name: ${doctorData['firstName'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Last Name : ${doctorData['lastName'] ?? ' - '}',
+            Text('Last Name: ${doctorData['lastName'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Date of Birth : $formattedDateOfBirth',
+            Text('Date of Birth: $formattedDateOfBirth',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('Address : ${doctorData['address'] ?? ' - '}',
+            Text('Country: ${doctorData['country'] ?? ' - '}',
                 style: const TextStyle(fontSize: 16.0)),
             const SizedBox(height: 10.0),
-            Text('City : ${doctorData['city'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
-            const SizedBox(height: 10.0),
-            Text('Postal Code : ${doctorData['postalCode'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
-            const SizedBox(height: 10.0),
-            Text('Country : ${doctorData['country'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
-            const SizedBox(height: 10.0),
-            Text('Phone : ${doctorData['phone'] ?? ' - '}',
-                style: const TextStyle(fontSize: 16.0)),
+
+            // Editable fields
+            _buildEditableField('Address', _addressController),
+            _buildEditableField('City', _cityController),
+            _buildEditableField('Postal Code', _postalCodeController),
+            _buildEditableField('Phone', _phoneController),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildEditableField(String label, TextEditingController controller) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(fontSize: 16.0),
+        ),
+        const SizedBox(height: 5.0),
+        _isEditing
+            ? TextField(controller: controller)
+            : Text(
+                controller.text,
+                style: const TextStyle(fontSize: 16.0),
+              ),
+        const SizedBox(height: 10.0),
+      ],
     );
   }
 }

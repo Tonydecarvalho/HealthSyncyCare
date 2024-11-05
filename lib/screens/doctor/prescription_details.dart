@@ -12,7 +12,11 @@ class DoctorPrescriptionsPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Color(0xFF008000),
+        backgroundColor: Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'Prescription Details',
           style: TextStyle(
@@ -186,7 +190,7 @@ class DoctorPrescriptionsPage extends StatelessWidget {
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Color(0xFF008000),
+                      backgroundColor: Color(0xFF176139),
                       padding:
                           EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                     ),

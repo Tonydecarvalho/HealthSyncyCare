@@ -34,7 +34,11 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000),
+        backgroundColor: const Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'My Prescriptions',
           style: TextStyle(
@@ -68,7 +72,7 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
                   onPressed: _toggleDateSortOrder,
                   icon: Icon(
                     isDateDescending ? Icons.arrow_downward : Icons.arrow_upward,
-                    color: Color(0xFF008000),
+                    color: Color(0xFF176139),
                   ),
                   tooltip: isDateDescending ? 'Sort: Newest First' : 'Sort: Oldest First',
                 ),
@@ -93,7 +97,17 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
                         );
                       }
 
-                      var prescriptions = snapshot.data!.docs;
+                      // Copy prescriptions to a local list and sort them by date locally
+                      List<DocumentSnapshot> prescriptions = snapshot.data!.docs;
+
+                      // Sort prescriptions by 'createdAt' locally
+                      prescriptions.sort((a, b) {
+                        Timestamp aTimestamp = a['createdAt'];
+                        Timestamp bTimestamp = b['createdAt'];
+                        return isDateDescending
+                            ? bTimestamp.compareTo(aTimestamp)
+                            : aTimestamp.compareTo(bTimestamp);
+                      });
 
                       return ListView.builder(
                         itemCount: prescriptions.length,
@@ -141,7 +155,7 @@ class _PatientPrescriptionsPageState extends State<PatientPrescriptionsPage> {
                                         return Text("${drug['drug']} - Quantity: ${drug['quantity']}");
                                       }).toList(),
                                     ),
-                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF008000)),
+                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF176139)),
                                     onTap: () {
                                       Navigator.pushNamed(
                                         context,

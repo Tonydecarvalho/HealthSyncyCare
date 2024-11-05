@@ -41,7 +41,11 @@ class _PatientsConditionsPatientState extends State<PatientsConditionsPatient> {
       appBar: AppBar(
         // Header of the page
         centerTitle: true,
-        backgroundColor: const Color(0xFF008000), // Green color for the app bar
+        backgroundColor: const Color(0xFF176139), // Green color for the app bar
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: const Text(
           'Your Conditions',
           style: TextStyle(
@@ -75,7 +79,7 @@ class _PatientsConditionsPatientState extends State<PatientsConditionsPatient> {
                   onPressed: _toggleDateSortOrder, // Call function when clicked
                   icon: Icon(
                     isDateDescending ? Icons.arrow_downward : Icons.arrow_upward, // Change icon based on order
-                    color: const Color(0xFF008000), // Green color
+                    color: const Color(0xFF176139), // Green color
                   ),
                   tooltip: isDateDescending ? 'Sort: Newest First' : 'Sort: Oldest First', // Tooltip
                 ),
@@ -160,7 +164,7 @@ class _PatientsConditionsPatientState extends State<PatientsConditionsPatient> {
                                         color: Colors.black87,
                                       ),
                                     ),
-                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF008000)), // Right arrow icon
+                                    trailing: const Icon(Icons.chevron_right, color: Color(0xFF176139)), // Right arrow icon
                                     onTap: () {
                                       // Navigate to the patient condition details page when tapped
                                       Navigator.pushNamed(

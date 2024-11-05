@@ -22,9 +22,13 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        backgroundColor: Color(0xFF008000),
+        backgroundColor: Color(0xFF176139),
+        leading: IconButton( // Back button
+          icon: Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(
-          "Patients",
+          "Patients Conditions", 
           style: TextStyle(
             fontSize: 23.0,
             fontWeight: FontWeight.w600,
@@ -75,10 +79,14 @@ class _PatientsConditionsPage extends State<PatientsConditions> {
                 );
               }
 
+              // Trie les résultats localement par timestamp en ordre décroissant
+              List<QueryDocumentSnapshot> sortedConditions = conditionSnapshot.data!.docs;
+              sortedConditions.sort((a, b) => (b['timestamp'] as Timestamp).compareTo(a['timestamp'] as Timestamp));
+
               return ListView.builder(
-                itemCount: conditionSnapshot.data!.docs.length,
+                itemCount: sortedConditions.length,
                 itemBuilder: (context, index) {
-                  final DocumentSnapshot conditionDoc = conditionSnapshot.data!.docs[index];
+                  final DocumentSnapshot conditionDoc = sortedConditions[index];
                   final String patientId = conditionDoc['patientId'];
 
                   return FutureBuilder<DocumentSnapshot>(

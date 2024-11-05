@@ -37,6 +37,9 @@ flutter_icons:
 flutter:
   assets:
     - assets/privacy_policy.json
+    - assets/Healthsyncycare.png
+    - assets/logo.png
+    - .env
   uses-material-design: true
 
 flutter_launcher_icons:
