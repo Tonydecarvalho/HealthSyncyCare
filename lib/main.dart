@@ -37,6 +37,14 @@ void main() async {
       measurementId: "G-7LEGTKC5N0",
     ),
   );
+    // Load the .env file before running the app
+  try {
+    await dotenv.load(fileName: ".env");
+    print("Environment variables loaded successfully");
+  } catch (e) {
+    print("Error loading .env file: $e");
+  }
+
   runApp(MyApp());
 }
 
