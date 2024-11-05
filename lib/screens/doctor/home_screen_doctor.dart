@@ -8,6 +8,7 @@ class MyHomePageDoctor extends StatefulWidget {
 }
 
 class MyHomePageDoctorState extends State<MyHomePageDoctor> {
+  // Variable to store the doctor's name retrieved from Firestore.
   String userName = '';
 
   @override
@@ -16,6 +17,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
     _getUserName();
   }
 
+  // Fetches the current user's first name from Firestore and updates the state.
   Future<void> _getUserName() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -33,6 +35,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
     }
   }
 
+  // Categories to be displayed on the home page.
   final List categoriesNames = [
     "Patient",
     "Patient Reports",
@@ -40,10 +43,10 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
     "History prescription"
   ];
 
+  // Icons corresponding to each category.
   final List<Icon> categoriesIcons = [
     const Icon(Icons.person, color: Color(0xFF176139), size: 80),
-    const Icon(Icons.medical_services_sharp,
-        color: Color(0xFF176139), size: 80),
+    const Icon(Icons.medical_services_sharp, color: Color(0xFF176139), size: 80),
     const Icon(Icons.calendar_month_sharp, color: Color(0xFF176139), size: 80),
     const Icon(Icons.history, color: Color(0xFF176139), size: 80)
   ];
@@ -53,6 +56,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
     return Scaffold(
       body: ListView(
         children: [
+          // Header container with doctor's name and profile navigation.
           Container(
             padding: EdgeInsets.only(top: 15, left: 15, right: 15, bottom: 10),
             decoration: const BoxDecoration(
@@ -64,6 +68,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Top row with logo and account icon.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -82,6 +87,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Displays the doctor's name dynamically.
                 Padding(
                   padding: EdgeInsets.only(left: 3, bottom: 15),
                   child: Text("Dr $userName,",
@@ -99,6 +105,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
             padding: EdgeInsets.only(top: 20, left: 15, right: 15),
             child: Column(
               children: [
+                // Section label.
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: [
@@ -110,6 +117,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                   ],
                 ),
                 const SizedBox(height: 20),
+                // Grid view for categories, each with an icon and text label.
                 GridView.builder(
                     itemCount: categoriesNames.length,
                     shrinkWrap: true,
@@ -123,6 +131,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                     itemBuilder: (context, index) {
                       return InkWell(
                           onTap: () {
+                            // Navigation based on index. Tapping a category navigates to a specific page.
                             switch (index) {
                               case 0:
                                 Navigator.pushNamed(context, '/patients list');
@@ -131,7 +140,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                               case 1:
                                 Navigator.pushNamed(
                                     context, '/patients conditions');
-                                print("Open Patient page");
+                                print("Open Patient Reports page");
                                 break;
                               case 2:
                                 Navigator.pushNamed(
@@ -147,6 +156,7 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                                 print("default");
                             }
                           },
+                          // Container for each category with styling.
                           child: Container(
                             padding: EdgeInsets.symmetric(
                                 vertical: 20, horizontal: 10),
@@ -162,10 +172,12 @@ class MyHomePageDoctorState extends State<MyHomePageDoctor> {
                                 ]),
                             child: Column(
                               children: [
+                                // Icon for the category.
                                 Padding(
                                     padding: EdgeInsets.all(10),
                                     child: categoriesIcons[index]),
                                 const SizedBox(height: 10),
+                                // Text label for the category.
                                 FittedBox(
                                     fit: BoxFit.scaleDown,
                                     child: Text(

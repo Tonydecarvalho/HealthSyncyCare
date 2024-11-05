@@ -4,38 +4,41 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 class SharedConditionPage extends StatefulWidget {
   const SharedConditionPage({Key? key}) : super(key: key);
-
   @override
   _SharedConditionPageState createState() => _SharedConditionPageState();
 }
 
 class _SharedConditionPageState extends State<SharedConditionPage> {
-  final TextEditingController _descriptionController = TextEditingController();
-  List<Map<String, dynamic>> _symptoms = [];
-  int? _selectedDuration;
+  final TextEditingController _descriptionController = TextEditingController(); // Text controller for symptom description
+  List<Map<String, dynamic>> _symptoms = []; // List of symptoms
+  int? _selectedDuration; // Duration of the symptom
   final List<int> _days = List.generate(30, (index) => index + 1); // 1 to 30 days
 
   void _addSymptom() {
-    final description = _descriptionController.text;
-    final duration = _selectedDuration;
+    final description = _descriptionController.text; // Get the symptom description
+    final duration = _selectedDuration; // Get the duration
     final timestamp = Timestamp.now(); // Current date and time
 
+    // Check if the description is not empty and the duration is selected
     if (description.isNotEmpty && duration != null) {
+      // Add the symptom to the list
       setState(() {
         _symptoms.add({
           'description': description,
           'duration': duration,
           'timestamp': timestamp,
         });
+        // Clear the text field and reset the duration
         _descriptionController.clear();
         _selectedDuration = null;
       });
     }
   }
 
+  // Save the symptoms to the database
   Future<void> _saveConditions() async {
     if (_symptoms.isEmpty) return;
-
+    // Get the current user
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,21 +46,21 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
       );
       return;
     }
-
+    // Get the patient ID, create a new condition document, and add the symptoms
     final patientId = user.uid;
     final conditionRef = FirebaseFirestore.instance.collection('conditions').doc();
     final timestamp = Timestamp.now();
-
+    // Set the condition document with the patient ID, timestamp, and no prescription
     await conditionRef.set({
       'patientId': patientId,
       'timestamp': timestamp,
       'hasPrescription': false, // Initialement sans prescription
     });
-
+    // Add each symptom to the condition document
     for (var symptom in _symptoms) {
       await conditionRef.collection('symptoms').add(symptom);
     }
-
+    // Clear the symptoms list
     setState(() {
       _symptoms.clear();
     });
@@ -65,6 +68,7 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
     _showSubmissionSuccessDialog();
   }
 
+  // Show a dialog to confirm the submission
   void _showSubmissionSuccessDialog() {
     showDialog(
       context: context,
@@ -86,6 +90,7 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
     );
   }
 
+  // Build the UI
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -124,7 +129,7 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
               ),
             ),
             SizedBox(height: 10),
-            // Duration Dropdown
+            // Duration Dropdown for selecting the number of days
             DropdownButtonFormField<int>(
               value: _selectedDuration,
               decoration: InputDecoration(
@@ -155,11 +160,13 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
               menuMaxHeight: 200,
             ),
             SizedBox(height: 20),
+            // Add Symptom Button
             ElevatedButton(
               onPressed: _addSymptom,
               child: Text('Add Symptom'),
             ),
             SizedBox(height: 20),
+            // List of Symptoms added by the user (ListView)
             Expanded(
               child: ListView.builder(
                 itemCount: _symptoms.length,
@@ -172,6 +179,7 @@ class _SharedConditionPageState extends State<SharedConditionPage> {
                 },
               ),
             ),
+            // Submit Symptoms Button (Enabled only if symptoms are added)
             if (_symptoms.isNotEmpty)
               ElevatedButton(
                 onPressed: _saveConditions,

@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
 
+  // Create the state for our class
   @override
   _ProfilePageState createState() => _ProfilePageState();
 }
@@ -14,19 +15,25 @@ class ProfilePage extends StatefulWidget {
 class _ProfilePageState extends State<ProfilePage> {
   // Variables for edition
   bool _isEditing = false;
-  final TextEditingController _addressController = TextEditingController();
-  final TextEditingController _cityController = TextEditingController();
-  final TextEditingController _postalCodeController = TextEditingController();
-  final TextEditingController _phoneController = TextEditingController();
+  final TextEditingController _addressController = TextEditingController(); // Controllers for the text fields
+  final TextEditingController _cityController = TextEditingController(); // Controllers for the text fields
+  final TextEditingController _postalCodeController = TextEditingController(); // Controllers for the text fields
+  final TextEditingController _phoneController = TextEditingController(); // Controllers for the text fields
 
+  // Logout function
   Future<void> _logout(BuildContext context) async {
+    // Sign out the user
     await FirebaseAuth.instance.signOut();
+    // Redirect to the login screen
     Navigator.of(context).pushReplacementNamed('/login');
   }
 
+  // Get the user data from Firestore
   Future<Map<String, dynamic>> _getUserAndDoctorData() async {
+    // Get the user ID
     String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
+    // Get the user data from Firestore
     DocumentSnapshot userSnapshot =
         await FirebaseFirestore.instance.collection('users').doc(uid).get();
 
@@ -34,8 +41,10 @@ class _ProfilePageState extends State<ProfilePage> {
       throw Exception("User does not exist!");
     }
 
+    // Get the user data as a Map 
     Map<String, dynamic> userData = userSnapshot.data() as Map<String, dynamic>;
 
+    // Get the doctor data if the user has a doctor
     if (userData.containsKey('doctorId') && userData['doctorId'] != null) {
       String doctorId = userData['doctorId'];
       DocumentSnapshot doctorSnapshot = await FirebaseFirestore.instance
@@ -57,6 +66,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return userData;
   }
 
+  // Update the user data in Firestore with the new values
   Future<void> _updateUserData() async {
     String uid = FirebaseAuth.instance.currentUser?.uid ?? '';
 
@@ -68,17 +78,19 @@ class _ProfilePageState extends State<ProfilePage> {
     });
   }
 
+  // Navigate to the privacy policy page when the user clicks on the link
   void _navigateToPrivacyPolicy(BuildContext context) {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
     );
   }
-
+  
+  // Delete the user account 
   Future<void> _deleteAccount(BuildContext context) async {
     final user = FirebaseAuth.instance.currentUser;
     final TextEditingController _confirmationController =
         TextEditingController();
-
+    // Show a dialog to confirm the deletion
     showDialog(
       context: context,
       builder: (BuildContext dialogContext) {
@@ -160,6 +172,7 @@ class _ProfilePageState extends State<ProfilePage> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
+          // Edit and Save buttons
           if (!_isEditing)
             IconButton( // Edit button state
               icon: const Icon(Icons.edit),
@@ -294,7 +307,7 @@ class _ProfilePageState extends State<ProfilePage> {
         formattedDateOfBirth = 'Invalid Date';
       }
     }
-
+    // User information card
     return Card(
       elevation: 4.0,
       child: Padding(
@@ -366,7 +379,7 @@ class _ProfilePageState extends State<ProfilePage> {
     final String fullName =
         '${doctorData['firstName'] ?? ' - '} ${doctorData['lastName'] ?? ' - '}';
 
-    // Doctor information
+    // Doctor information card
     return Card(
       elevation: 4.0,
       child: Padding(
@@ -392,7 +405,7 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-
+  // No doctor information card
   Widget _buildNoDoctorInfo() {
     return const Card(
       elevation: 4.0,

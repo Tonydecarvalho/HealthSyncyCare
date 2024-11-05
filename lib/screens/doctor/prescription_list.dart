@@ -13,16 +13,16 @@ class DoctorPrescriptionsHistoryPage extends StatefulWidget {
 
 class _DoctorPrescriptionsHistoryPageState
     extends State<DoctorPrescriptionsHistoryPage> {
-  final String? doctorId = FirebaseAuth.instance.currentUser?.uid;
-  Map<String, bool> expandedPatients = {}; // Track expanded state for each patient
-  bool isNameAscending = true; // To toggle patient name sorting
-  bool isDateDescending = true; // To toggle prescription date sorting
-  String searchQuery = ''; // For filtering patients by search query
+  final String? doctorId = FirebaseAuth.instance.currentUser?.uid; // Retrieve the current doctor's UID for querying their patients.
+  Map<String, bool> expandedPatients = {}; // Used to track the expansion state of each patient's detail view.
+  bool isNameAscending = true; // Controls the sorting order of patient names.
+  bool isDateDescending = true; // Controls the sorting order of prescription dates.
+  String searchQuery = ''; // Stores the current search term entered by the user.
 
   @override
   void initState() {
     super.initState();
-    _fetchPatientsWithPrescriptions();
+    _fetchPatientsWithPrescriptions(); // Fetch initial list of patients with prescriptions on widget load.
   }
 
   Future<void> _fetchPatientsWithPrescriptions() async {
@@ -43,7 +43,7 @@ class _DoctorPrescriptionsHistoryPageState
         // Only keep patients with at least one prescription
         if (prescriptionsQuery.docs.isNotEmpty) {
           setState(() {
-            expandedPatients[doc.id] = false; // Initialize collapsed state
+            expandedPatients[doc.id] = false; // Initializes each patient's expanded state to false (collapsed).
           });
         }
       }
@@ -52,28 +52,28 @@ class _DoctorPrescriptionsHistoryPageState
 
   void _toggleExpand(String patientId) {
     setState(() {
-      expandedPatients[patientId] = !(expandedPatients[patientId] ?? false);
+      expandedPatients[patientId] = !(expandedPatients[patientId] ?? false); // Toggles the expansion state of a patient's detail view.
     });
   }
 
   // Toggle sorting order for patient names
   void _toggleNameSortOrder() {
     setState(() {
-      isNameAscending = !isNameAscending;
+      isNameAscending = !isNameAscending; // Toggles the name sorting order between ascending and descending.
     });
   }
 
   // Toggle sorting order for prescription dates
   void _toggleDateSortOrder() {
     setState(() {
-      isDateDescending = !isDateDescending;
+      isDateDescending = !isDateDescending; // Toggles the date sorting order between descending and ascending.
     });
   }
 
   // Function to handle search input change
   void _onSearchChanged(String query) {
     setState(() {
-      searchQuery = query.toLowerCase();
+      searchQuery = query.toLowerCase(); // Updates the search query to filter the displayed patient list.
     });
   }
 
@@ -83,9 +83,9 @@ class _DoctorPrescriptionsHistoryPageState
       appBar: AppBar(
         centerTitle: true,
         backgroundColor: const Color(0xFF176139),
-        leading: IconButton( // Back button
+        leading: IconButton(
           icon: Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
+          onPressed: () => Navigator.of(context).pop(), // Allows navigation back to the previous screen.
         ),
         title: const Text(
           'Patients & Prescriptions',
@@ -111,7 +111,7 @@ class _DoctorPrescriptionsHistoryPageState
                       border: OutlineInputBorder(),
                       prefixIcon: Icon(Icons.search),
                     ),
-                    onChanged: _onSearchChanged, // Update search query when user types
+                    onChanged: _onSearchChanged, // Handles search input changes.
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -122,7 +122,7 @@ class _DoctorPrescriptionsHistoryPageState
                     isNameAscending ? Icons.sort_by_alpha : Icons.sort_by_alpha_outlined,
                     color: Color(0xFF176139),
                   ),
-                  tooltip: isNameAscending ? 'Sort: A-Z' : 'Sort: Z-A',
+                  tooltip: isNameAscending ? 'Sort: A-Z' : 'Sort: Z-A', // Provides a tooltip based on the current sort order.
                 ),
                 const SizedBox(width: 10),
                 IconButton(
@@ -131,14 +131,14 @@ class _DoctorPrescriptionsHistoryPageState
                     isDateDescending ? Icons.arrow_downward : Icons.arrow_upward,
                     color: Color(0xFF176139),
                   ),
-                  tooltip: isDateDescending ? 'Sort: Newest First' : 'Sort: Oldest First',
+                  tooltip: isDateDescending ? 'Sort: Newest First' : 'Sort: Oldest First', // Provides a tooltip based on the current date sort order.
                 ),
               ],
             ),
           ),
           Expanded(
             child: doctorId == null
-                ? const Center(child: Text('Error: User not logged in.'))
+                ? const Center(child: Text('Error: User not logged in.')) // Error handling if no doctor is logged in.
                 : StreamBuilder<QuerySnapshot>(
                     stream: FirebaseFirestore.instance
                         .collection('users')
@@ -146,21 +146,21 @@ class _DoctorPrescriptionsHistoryPageState
                         .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Center(child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator()); // Shows a loading indicator while data is loading.
                       }
                       if (snapshot.hasError || !snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                        return const Center(child: Text('No patients found.'));
+                        return const Center(child: Text('No patients found.')); // Displays a message if no patients are found.
                       }
 
                       var patients = snapshot.data!.docs;
 
-                      // Filter patients by search query
+                      // Filters patients based on the search query.
                       patients = patients.where((patient) {
                         final fullName = "${patient['lastName']} ${patient['firstName']}".toLowerCase();
                         return fullName.contains(searchQuery);
                       }).toList();
 
-                      // Sort patients by name
+                      // Sorts patients based on the current sorting criteria.
                       patients.sort((a, b) {
                         final nameA = "${a['lastName']} ${a['firstName']}".toLowerCase();
                         final nameB = "${b['lastName']} ${b['firstName']}".toLowerCase();
@@ -174,9 +174,9 @@ class _DoctorPrescriptionsHistoryPageState
                           final String fullName = "${patientData['lastName']} ${patientData['firstName']}";
                           final String dateOfBirth = DateFormat('dd MMMM yyyy').format(
                             DateTime.parse(patientData['dateOfBirth']),
-                          ); // Changed format to dd MMMM yyyy
+                          );
                           final String patientId = patientData.id;
-                          final bool isExpanded = expandedPatients[patientId] ?? false;
+                          final bool isExpanded = expandedPatients[patientId] ?? false; // Retrieves the expansion state for each patient.
 
                           return Column(
                             children: [
@@ -187,9 +187,9 @@ class _DoctorPrescriptionsHistoryPageState
                                 ),
                                 subtitle: Text("Date of Birth: $dateOfBirth"),
                                 trailing: Icon(isExpanded ? Icons.expand_less : Icons.expand_more),
-                                onTap: () => _toggleExpand(patientId),
+                                onTap: () => _toggleExpand(patientId), // Handles expanding or collapsing the detail view.
                               ),
-                              if (isExpanded)
+                              if (isExpanded) // Conditionally renders the prescriptions if the detail view is expanded.
                                 StreamBuilder<QuerySnapshot>(
                                   stream: FirebaseFirestore.instance
                                       .collection('prescriptions')
@@ -207,7 +207,7 @@ class _DoctorPrescriptionsHistoryPageState
 
                                     var prescriptions = snapshot.data!.docs;
 
-                                    // Sort prescriptions by date
+                                    // Sorts prescriptions by date based on the current sorting criteria.
                                     prescriptions.sort((a, b) {
                                       final dateA = (a['createdAt'] as Timestamp).toDate();
                                       final dateB = (b['createdAt'] as Timestamp).toDate();
@@ -215,13 +215,13 @@ class _DoctorPrescriptionsHistoryPageState
                                     });
 
                                     return ListView.builder(
-                                      physics: NeverScrollableScrollPhysics(),
-                                      shrinkWrap: true,
+                                      physics: NeverScrollableScrollPhysics(), // Prevents the inner list from scrolling independently.
+                                      shrinkWrap: true, // Allows the inner list to size itself to its children.
                                       itemCount: prescriptions.length,
                                       itemBuilder: (context, index) {
                                         final prescriptionData = prescriptions[index];
                                         final Timestamp timestamp = prescriptionData['createdAt'];
-                                        final String formattedDate = DateFormat('dd.MM.yyyy').format(timestamp.toDate()); // Changed format to dd.MM.yyyy
+                                        final String formattedDate = DateFormat('dd.MM.yyyy').format(timestamp.toDate());
 
                                         return ListTile(
                                           title: Text("Prescription Date: $formattedDate"),
@@ -236,7 +236,7 @@ class _DoctorPrescriptionsHistoryPageState
                                               return Column(
                                                 crossAxisAlignment: CrossAxisAlignment.start,
                                                 children: drugs.map((drug) {
-                                                  return Text("${drug['drug']} - Quantity: ${drug['quantity']}");
+                                                  return Text("${drug['drug']} - Quantity: ${drug['quantity']}"); // Lists each drug and its quantity.
                                                 }).toList(),
                                               );
                                             },
@@ -245,7 +245,7 @@ class _DoctorPrescriptionsHistoryPageState
                                             Navigator.pushNamed(
                                               context,
                                               '/doctor prescriptions',
-                                              arguments: prescriptionData.id,
+                                              arguments: prescriptionData.id, // Navigates to a detailed prescription page when tapped.
                                             );
                                           },
                                         );
@@ -253,7 +253,7 @@ class _DoctorPrescriptionsHistoryPageState
                                     );
                                   },
                                 ),
-                              Divider(),
+                              Divider(), // Adds a visual separator.
                             ],
                           );
                         },

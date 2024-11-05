@@ -14,18 +14,21 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
+// RegisterPageState class
 class _RegisterPageState extends State<RegisterPage> {
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _repeatPasswordController = TextEditingController();
+  final TextEditingController _repeatPasswordController =
+      TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _postalCodeController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
 
+  // Variables for the form fields and the selected doctor
   String? _selectedGender;
   DateTime? _selectedDateOfBirth;
   String? _selectedDoctorId;
@@ -41,12 +44,14 @@ class _RegisterPageState extends State<RegisterPage> {
 
   List<Map<String, dynamic>> _doctors = [];
 
+  // Initial state
   @override
   void initState() {
     super.initState();
     _fetchDoctors(); // Récupérer les médecins
   }
 
+  // Fetch doctors from Firestore to populate the dropdown
   Future<void> _fetchDoctors() async {
     try {
       QuerySnapshot snapshot = await FirebaseFirestore.instance
@@ -54,42 +59,50 @@ class _RegisterPageState extends State<RegisterPage> {
           .where('role', isEqualTo: 'doctor')
           .get();
       setState(() {
-        _doctors = snapshot.docs.map((doc) => {
-              'id': doc.id,
-              'firstName': doc['firstName'],
-              'lastName': doc['lastName'],
-              'address': doc['address'],
-              'phone': doc['phone']
-            }).toList();
+        _doctors = snapshot.docs
+            .map((doc) => {
+                  'id': doc.id,
+                  'firstName': doc['firstName'],
+                  'lastName': doc['lastName'],
+                  'address': doc['address'],
+                  'phone': doc['phone']
+                })
+            .toList();
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Failed to load doctors: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Failed to load doctors: $e')));
     }
   }
 
+  // Toggle password visibility
   void _togglePasswordVisibility() {
     setState(() {
       _obscurePassword = !_obscurePassword;
     });
   }
 
+  // Toggle repeat password visibility
   void _toggleRepeatPasswordVisibility() {
     setState(() {
       _obscureRepeatPassword = !_obscureRepeatPassword;
     });
   }
 
-    void _navigateToLogin() {
+  // Navigate to login page
+  void _navigateToLogin() {
     Navigator.of(context)
         .pushReplacement(MaterialPageRoute(builder: (context) => LoginPage()));
   }
 
+// Navigate to privacy policy page
   void _navigateToPrivacyPolicy() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (context) => PrivacyPolicyPage()),
     );
   }
 
+  // Select date of birth
   Future<void> _selectDateOfBirth(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -104,24 +117,29 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+// Sign up function
   Future<void> _signUp() async {
     // Validation du mot de passe
     if (_passwordController.text != _repeatPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Passwords do not match")));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("Passwords do not match")));
       return;
     }
 
+//Validate the form fields
     setState(() {
       _isLoading = true;
     });
 
     try {
-      // Inscription avec Firebase Auth
-      UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      // Register the user with email and password in Firebase Auth
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
 
+      // Save the user data in Firestore
       Map<String, dynamic> userData = {
         'gender': _selectedGender,
         'firstName': _firstNameController.text,
@@ -137,17 +155,28 @@ class _RegisterPageState extends State<RegisterPage> {
         'createdAt': DateTime.now(),
       };
 
+      // Add the doctorId to the user data if the user is a patient
       if (_isChecked) {
         userData['doctorId'] = _selectedDoctorId;
       }
 
-      await FirebaseFirestore.instance.collection('users').doc(userCredential.user?.uid).set(userData);
+      // Save the user data in Firestore
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(userCredential.user?.uid)
+          .set(userData);
 
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("User Registered Successfully")));
+      // Show a success message and navigate to the home page
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("User Registered Successfully")));
 
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context) => _isChecked ? MyHomePage() : MyHomePageDoctor()));
+      // Navigate to the home page
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) =>
+              _isChecked ? MyHomePage() : MyHomePageDoctor()));
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Registration failed: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('Registration failed: $e')));
     } finally {
       setState(() {
         _isLoading = false;
@@ -155,8 +184,8 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  // Reset doctor selection
   void _resetDoctorSelection() {
-    // Fonction pour réinitialiser la sélection du médecin
     setState(() {
       _selectedDoctorId = null;
       _selectedDoctorFirstName = null;
@@ -166,6 +195,7 @@ class _RegisterPageState extends State<RegisterPage> {
     });
   }
 
+  // Build the register form
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -182,10 +212,12 @@ class _RegisterPageState extends State<RegisterPage> {
                   height: 100,
                 ),
                 SizedBox(height: 40),
-
                 Text(
                   "Create Your Account",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87),
                 ),
                 SizedBox(height: 8),
                 Text(
@@ -193,7 +225,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                 ),
                 SizedBox(height: 40),
-
                 DropdownButtonFormField<String>(
                   decoration: _inputDecoration("Gender"),
                   value: _selectedGender,
@@ -210,28 +241,33 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 SizedBox(height: 20),
-
                 _buildTextField(_firstNameController, "First Name"),
                 _buildTextField(_lastNameController, "Last Name"),
                 TextFormField(
                   readOnly: true,
                   onTap: () => _selectDateOfBirth(context),
-                  decoration: _inputDecoration(_selectedDateOfBirth == null ? 'Date of Birth' : 'Date of Birth: ${DateFormat.yMd().format(_selectedDateOfBirth!)}').copyWith(
+                  decoration: _inputDecoration(_selectedDateOfBirth == null
+                          ? 'Date of Birth'
+                          : 'Date of Birth: ${DateFormat.yMd().format(_selectedDateOfBirth!)}')
+                      .copyWith(
                     suffixIcon: Icon(Icons.calendar_today, color: Colors.grey),
                   ),
                 ),
                 SizedBox(height: 20),
-
-                _buildTextField(_emailController, "Email", TextInputType.emailAddress),
+                _buildTextField(
+                    _emailController, "Email", TextInputType.emailAddress),
                 _buildTextField(_phoneController, "Phone", TextInputType.phone),
                 _buildTextField(_addressController, "Street Address"),
                 _buildTextField(_cityController, "City"),
                 _buildTextField(_postalCodeController, "Postal Code"),
                 _buildTextField(_countryController, "Country"),
-
-                _buildPasswordField(_passwordController, "Password", _obscurePassword, _togglePasswordVisibility),
-                _buildPasswordField(_repeatPasswordController, "Repeat Password", _obscureRepeatPassword, _toggleRepeatPasswordVisibility),
-
+                _buildPasswordField(_passwordController, "Password",
+                    _obscurePassword, _togglePasswordVisibility),
+                _buildPasswordField(
+                    _repeatPasswordController,
+                    "Repeat Password",
+                    _obscureRepeatPassword,
+                    _toggleRepeatPasswordVisibility),
                 Row(
                   children: [
                     Checkbox(
@@ -246,7 +282,6 @@ class _RegisterPageState extends State<RegisterPage> {
                     Text("Patient"),
                   ],
                 ),
-
                 if (_isChecked) ...[
                   DropdownButton<String>(
                     hint: Text("Select a Doctor"),
@@ -254,16 +289,21 @@ class _RegisterPageState extends State<RegisterPage> {
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedDoctorId = newValue;
-                        var selectedDoctor = _doctors.firstWhere((doctor) => doctor['id'] == newValue, orElse: () => {});
+                        var selectedDoctor = _doctors.firstWhere(
+                            (doctor) => doctor['id'] == newValue,
+                            orElse: () => {});
                         _selectedDoctorFirstName = selectedDoctor['firstName'];
                         _selectedDoctorLastName = selectedDoctor['lastName'];
                         _selectedDoctorAddress = selectedDoctor['address'];
                         _selectedDoctorPhoneNumber = selectedDoctor['phone'];
                       });
                     },
-                    items: _doctors.map<DropdownMenuItem<String>>((Map<String, dynamic> doctor) {
-                      String fullName = "${doctor['firstName']} ${doctor['lastName']}";
-                      return DropdownMenuItem<String>(value: doctor['id'], child: Text(fullName));
+                    items: _doctors.map<DropdownMenuItem<String>>(
+                        (Map<String, dynamic> doctor) {
+                      String fullName =
+                          "${doctor['firstName']} ${doctor['lastName']}";
+                      return DropdownMenuItem<String>(
+                          value: doctor['id'], child: Text(fullName));
                     }).toList(),
                   ),
                   if (_selectedDoctorFirstName != null)
@@ -272,19 +312,20 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         children: [
                           Divider(),
-                          Text("Doctor Details:", style: TextStyle(fontWeight: FontWeight.bold)),
-                          Text("Name: $_selectedDoctorFirstName $_selectedDoctorLastName"),
+                          Text("Doctor Details:",
+                              style: TextStyle(fontWeight: FontWeight.bold)),
+                          Text(
+                              "Name: $_selectedDoctorFirstName $_selectedDoctorLastName"),
                           Text("Address: $_selectedDoctorAddress"),
                           Text("Phone: $_selectedDoctorPhoneNumber"),
                         ],
                       ),
                     ),
                 ],
-
                 SizedBox(height: 20),
                 _isLoading
                     ? CircularProgressIndicator()
-                     : SizedBox(
+                    : SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: _signUp,
@@ -308,16 +349,23 @@ class _RegisterPageState extends State<RegisterPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Already have an account?", style: TextStyle(color: Colors.grey[700])),
+                    Text("Already have an account?",
+                        style: TextStyle(color: Colors.grey[700])),
                     TextButton(
                       onPressed: _navigateToLogin,
-                      child: Text("Login", style: TextStyle(color: Theme.of(context).primaryColor, fontWeight: FontWeight.bold)),
+                      child: Text("Login",
+                          style: TextStyle(
+                              color: Theme.of(context).primaryColor,
+                              fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
                 TextButton(
                   onPressed: _navigateToPrivacyPolicy,
-                  child: Text("Privacy Policy", style: TextStyle(color: Colors.blueAccent, decoration: TextDecoration.underline)),
+                  child: Text("Privacy Policy",
+                      style: TextStyle(
+                          color: Colors.blueAccent,
+                          decoration: TextDecoration.underline)),
                 ),
               ],
             ),
@@ -327,14 +375,18 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
+  // Input decoration
   InputDecoration _inputDecoration(String label) => InputDecoration(
         labelText: label,
         filled: true,
         fillColor: Colors.grey[100],
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide.none),
       );
-
-  Widget _buildTextField(TextEditingController controller, String label, [TextInputType keyboardType = TextInputType.text]) {
+  // Build text field
+  Widget _buildTextField(TextEditingController controller, String label,
+      [TextInputType keyboardType = TextInputType.text]) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: TextField(
@@ -345,7 +397,9 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  Widget _buildPasswordField(TextEditingController controller, String label, bool obscureText, void Function() toggleVisibility) {
+  // Build password field
+  Widget _buildPasswordField(TextEditingController controller, String label,
+      bool obscureText, void Function() toggleVisibility) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20.0),
       child: TextField(
@@ -353,7 +407,8 @@ class _RegisterPageState extends State<RegisterPage> {
         obscureText: obscureText,
         decoration: _inputDecoration(label).copyWith(
           suffixIcon: IconButton(
-            icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off, color: Colors.grey),
+            icon: Icon(obscureText ? Icons.visibility : Icons.visibility_off,
+                color: Colors.grey),
             onPressed: toggleVisibility,
           ),
         ),
