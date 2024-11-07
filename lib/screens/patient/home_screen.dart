@@ -229,7 +229,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                 Text(
                                   categoriesNames[index],
                                   style: const TextStyle(
-                                      fontSize: 22,
+                                      fontSize: 20,
                                       fontWeight: FontWeight.w600,
                                       color: Color(0xFF000000)),
                                 ),
